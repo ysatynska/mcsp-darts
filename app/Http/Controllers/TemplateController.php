@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\AdminController;
+use App\Models\User;
+use RCAuth;
+
+class TemplateController extends Controller
+{
+    public static $TIME_FORMAT = 'g:i A';
+
+    public function __construct()
+    {
+        $side_navigation = [
+            '<span class="far fa-home"></span> Submit Score' => action([GamesController::class, 'submitScore']),
+        ];
+
+        if (RCAuth::check() || RCAuth::attempt()) {
+            $side_navigation['<span class="fa-regular fa-table-tennis-paddle-ball"></span> My Games'] = action([GamesController::class, 'myGames']);
+
+            $rcid = RCAuth::user()->rcid;
+
+            if ($rcid == '1285521' || $rcid == '1250537' || $rcid == '0248715' || $rcid == '0248715' || $rcid == '0003213') {
+                $side_navigation['<span class="far fa-list"></span> All Games'] = action([AdminController::class, 'allGames']);
+            }
+            $side_navigation['<span class="far fa-sign-out"></span> Logout '.RCAuth::user()->username] = route('logout');
+        } else {
+            $side_navigation['<span class="far fa-sign-in"></span> Login'] = route('login');
+        }
+        $this->side_navigation = $side_navigation;
+        view()->share('side_navigation', $side_navigation);
+    }
+}
