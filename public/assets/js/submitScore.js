@@ -43,6 +43,9 @@ function checkScoreValidity (event) {
     } else if (score1 > 20 && score2 > 20 && Math.abs(score1-score2) < 2) {
         event.preventDefault();
         generateError('There has to be at least two point difference between the scores.');
+    } else if ((score1 > 21 && (score1-score2) > 2) || (score2 > 21 && (score2-score1) > 2)) {
+        event.preventDefault();
+        generateError('Games have to be to 21.');
     }
 }
 

@@ -38,6 +38,8 @@ Route::middleware('force_login')->group(function () {
     Route::prefix('adminoptions')->group(function(){
         Route::middleware('force_admin')->group(function () {
             Route::get('all_games', [AdminController::class, 'allGames']);
+            Route::get('export_all', [AdminController::class, 'exportAll']);
+            Route::get('export', [AdminController::class, 'exportStudentOnly']);
         });
     });
 });

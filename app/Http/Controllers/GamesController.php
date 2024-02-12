@@ -52,15 +52,22 @@ class GamesController extends TemplateController
         return view('scoreRecorded', ['game' => $game]);
     }
 
-    public function myGames () {
+    public function myGames (Request $request) {
+        $search = $request->search;
         $rcid = RCAuth::user()->rcid;
 
         $all_games = Game::where('player1_rcid', $rcid)
                         ->orWhere('player2_rcid', $rcid)
-                        ->paginate(15);
+                        ->orderBy('created_at', 'DESC');
+
+        if ($request->has('search')) {
+            $all_games->search($search);
+        }
+
+        $all_games = $all_games->paginate(14)->withQueryString();
 
         $my_games = true;
         return view('adminoptions/allGames',
-        ['all_games' => $all_games, 'my_games' => $my_games, 'my_rcid' => $rcid]);
+        ['all_games' => $all_games, 'my_games' => $my_games, 'my_rcid' => $rcid, 'search' => $search]);
     }
 }
