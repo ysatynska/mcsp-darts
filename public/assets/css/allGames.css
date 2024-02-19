@@ -98,10 +98,8 @@ label, li, .pt-serif-pro {
     grid-gap: 0px !important;
 }
 
-@media screen and (max-width:768px) {
-    .main-container {
-        min-height: 0 !important;
-    }
+.font-16 {
+    font-size: 16px;
 }
 
 .bold {
@@ -117,6 +115,10 @@ label, li, .pt-serif-pro {
         min-height: 0 !important;
         padding-top: 20px !important;
         padding-top: 20px !important;
+    }
+
+    .font-sm-12 {
+        font-size: 12px;
     }
 }
 

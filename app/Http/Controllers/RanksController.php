@@ -18,6 +18,23 @@ class RanksController extends TemplateController
         parent::__construct();
     }
 
+    function convertToRanks ($row_ranks) {
+        $ranks = array();
+        $ordered_ranks = $row_ranks;
+        rsort($ordered_ranks);
+
+        foreach ($row_ranks as $key => $value) {
+            foreach ($ordered_ranks as $ordered_key => $ordered_value) {
+                if ($value === $ordered_value) {
+                    $key = $ordered_key;
+                    break;
+                }
+            }
+            $ranks[] = intval($key+1);
+        }
+        return $ranks;
+    }
+
     public function showRanks (Request $request) {
         $search = $request->search;
         $students_only = ($request->students_only === 'yes');

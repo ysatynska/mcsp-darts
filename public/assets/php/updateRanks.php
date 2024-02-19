@@ -72,6 +72,13 @@ function storeRanks ($ranks, $players, $rank_students) {
         }
     }
 }
+function addMinValue ($array) {
+    $min = (-1) * min($array);
+    foreach ($array as $key=>$item) {
+        $array[$key] += $min;
+    }
+    return $array;
+}
 
 function convertToRanks ($row_ranks) {
     $ranks = array();
@@ -90,16 +97,37 @@ function convertToRanks ($row_ranks) {
     return $ranks;
 }
 
+function storeRankings ($ranks, $players, $rank_students) {
+    $index = 0;
+    if ($rank_students === true){
+        foreach ($players as $player) {
+            $player->ranking_students = intval($ranks[$index]);
+            $index+=1;
+            $player->update();
+        }
+    } else {
+        foreach ($players as $player) {
+            $player->ranking_all = intval($ranks[$index]);
+            $index+=1;
+            $player->update();
+        }
+    }
+}
+
+function calculateRanks ($players, $only_students) {
+    $rref = getRREF($players);
+    $rankings = addMinValue($rref->getColumn($players->count()));
+    storeRankings($rankings, $players, $only_students);
+    $ranks = convertToRanks($rref->getColumn($players->count()));
+    storeRanks($ranks, $players, $only_students);
+}
+
 function updateRanks ($only_students) {
     $all_players = Player::all();
-    $rref_all = getRREF($all_players);
-    $ranks = convertToRanks($rref_all->getColumn($all_players->count()));
-    storeRanks($ranks, $all_players, false);
+    calculateRanks($all_players, false);
 
     if ($only_students === true){
         $student_players = Player::where('is_student', true)->get();
-        $rref_students = getRREF($student_players);
-        $ranks = convertToRanks($rref_students->getColumn($student_players->count()));
-        storeRanks($ranks, $student_players, true);
+        calculateRanks($student_players, true);
     }
 }

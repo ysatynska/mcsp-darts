@@ -96,6 +96,7 @@
                     @if (isset($ranks))
                         <th scope="col" class="bold">Rank </th>
                         <th scope="col" class="bold">Name </th>
+                        <th scope="col" class="bold">Ranking </th>
                         <th scope="col" class="bold">Total Net Points</th>
                     @else
                         <th scope="col" class="bold">Date </th>
@@ -124,6 +125,11 @@
                             <td> {{$data_point->rank_all}} </td>
                         @endif
                         <td> {{$data_point->name}} </td>
+                        @if ($students_only)
+                            <td> {{$data_point->ranking_students}} </td>
+                        @else
+                            <td> {{$data_point->ranking_all}} </td>
+                        @endif
                         <td> {{$data_point->total_net}} </td>
                     @else
                         <td> {{$data_point->created_at->format('M j, g:ma')}} </td>
@@ -170,8 +176,9 @@
                 {{$data->links()}}
             </div>
         </div>
-        <p style="color:#9F3A38; font-size:16px" class="pb-20">Note that Total Net Points is one of many variables affecting a player's rank. If someone with rank 1 beat someone with rank 30 with scores 21:0 multiple times, their Total Net Points will be very high. However, if a new player beat the person with rank 1 with scores 21:10, their Total Net Points would end up being much lower but they will likely get rank 1. </p>
-
+        @if (isset($ranks))
+            <p style="color:#9F3A38" class="pb-20 font-sm-12 font-16">Note that Total Net Points is one of many variables affecting a player's rank. If someone with rank 1 beat someone with rank 30 with scores 21:0 multiple times, their Total Net Points will be very high. However, if a new player beat the person with rank 1 with scores 21:10, their Total Net Points would end up being much lower but they will likely get rank 1. </p>
+        @endif
     </div>
 </html>
 @endsection
