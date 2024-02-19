@@ -18,14 +18,12 @@ use App\Models\Game;
 
 Route::get('login', function () {
     $returnURL = Session::get('returnURL', Request::url().'/../');
-
     return RCAuth::redirectToLogin($returnURL);
 })->name('login');
 
 Route::get('logout', function () {
     RCAuth::logout();
     $returnURL = Request::url().'/../';
-
     return RCAuth::redirectToLogout($returnURL);
 })->name('logout');
 

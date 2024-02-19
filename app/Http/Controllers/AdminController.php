@@ -25,8 +25,8 @@ class AdminController extends TemplateController
     }
 
     public function exportAll () {
-        $all_games = Game::get();
-        return \Excel::download(new GamesExport($all_games), 'Ping_Pong_Games_Data.xlsx');
+        $all_games = Game::orderBy('created_at','DESC')->get();
+        return \Excel::download(new GamesExport($all_games), 'pingpong_all.xlsx');
     }
 
     public function exportStudentOnly () {
@@ -37,7 +37,6 @@ class AdminController extends TemplateController
                                     $query->where('is_student', true)->withoutGlobalScopes();
                                 })
                                 ->get();
-
-        return \Excel::download(new GamesExport($games_students), 'Ping_Pong_All_Games_Data.xlsx');
+        return \Excel::download(new GamesExport($games_students), 'pingpong_students.xlsx');
     }
 }

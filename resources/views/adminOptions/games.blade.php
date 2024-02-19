@@ -133,6 +133,7 @@
                         <td> {{$data_point->total_net}} </td>
                     @else
                         <td> {{$data_point->created_at->format('M j, g:ma')}} </td>
+
                         @if (isset($my_games))
                             @if ($data_point->player1->rcid === $my_rcid)
                                 <td> {{$data_point->player2->name}} </td>
@@ -143,8 +144,6 @@
                                 <td> {{$data_point->player1_score}} </td>
                                 <td> {{$data_point->player2_score}} </td>
                             @endif
-                        @elseif (isset($ranks))
-                            {{-- do smth --}}
                         @else
                             <td> {{$data_point->player1->name}} </td>
                             <td> {{$data_point->player2->name}} </td>
@@ -159,17 +158,16 @@
 
         <div class="grid-2 mb-0">
             <div class="grid-item align-self-center py-15">
-                {{-- export option --}}
                 @if (isset($ranks))
                     <p style="color:gray; font-size:14px" class="mb-0">Last Updated: {{$last_updated}} </p>
-                    @elseif (isset($is_admin))
-                <a class = "btn btn-primary mb-2" name = "export" value="Export Excel"
-                    onclick="location.href = '{{action([App\Http\Controllers\AdminController::class, 'exportStudentOnly'])}}'"
-                >Export Students Only</a>
+                @elseif (isset($is_admin))
+                    <a class = "btn btn-primary mb-2" name = "export" value="Export Excel"
+                        onclick="location.href = '{{action([App\Http\Controllers\AdminController::class, 'exportStudentOnly'])}}'"
+                    >Export Students Only</a>
 
-                 <a class = "btn btn-primary mb-2" name = "export" value="Export Excel"
-                    onclick="location.href = '{{action([App\Http\Controllers\AdminController::class, 'exportAll'])}}'"
-                >Export All</a>
+                    <a class = "btn btn-primary mb-2" name = "export" value="Export Excel"
+                        onclick="location.href = '{{action([App\Http\Controllers\AdminController::class, 'exportAll'])}}'"
+                    >Export All</a>
                 @endif
             </div>
             <div class="grid-item justify-self-end align-self-center">
@@ -177,7 +175,8 @@
             </div>
         </div>
         @if (isset($ranks))
-            <p style="color:#9F3A38" class="pb-20 font-sm-12 font-16">Note that Total Net Points is one of many variables affecting a player's rank. If someone with rank 1 beat someone with rank 30 with scores 21:0 multiple times, their Total Net Points will be very high. However, if a new player beat the person with rank 1 with scores 21:10, their Total Net Points would end up being much lower but they will likely get rank 1. </p>
+            <p style="color:#197c8e" class="font-sm-12 font-17"><strong>Ranking:</strong> this is a calculated variable that predicts the outcome of future games betwen the players. If player A has ranking 15 and player B has ranking 23, player B is predicted to score 8 points more than player A. </p>
+            <p style="color:#197c8e" class="pb-20 font-sm-12 font-17"><strong>Total Net Points:</strong> this is a calculated variable showing the total number of points scored minus the total number of points lost by the player. This is just one of many variables affecting a player's rank. </p>
         @endif
     </div>
 </html>

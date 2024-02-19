@@ -20,7 +20,6 @@ class GamesController extends TemplateController
 
     public function submitScore() {
         $user = User::find(RCAuth::user()->rcid);
-
         return view('submitScore', ['user' => $user]);
     }
 
@@ -59,7 +58,6 @@ class GamesController extends TemplateController
     public function myGames (Request $request) {
         $search = $request->search;
         $rcid = RCAuth::user()->rcid;
-
         $all_games = Game::whereHas('player1', function ($query) use ($rcid) {
                                 $query->where('rcid', $rcid);
                             })
@@ -67,14 +65,12 @@ class GamesController extends TemplateController
                                 $query->where('rcid', $rcid);
                             })
                             ->orderBy('created_at', 'DESC');
-
         if ($request->has('search')) {
             $all_games->search($search);
         }
-
         $all_games = $all_games->paginate(14)->withQueryString();
-
         $my_games = true;
+
         return view('adminoptions/games',
         ['data' => $all_games, 'my_games' => $my_games, 'my_rcid' => $rcid, 'search' => $search]);
     }

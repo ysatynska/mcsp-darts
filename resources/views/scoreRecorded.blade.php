@@ -14,6 +14,7 @@
 @section('stylesheets')
     <link href="{{URL::asset('assets/css/allGames.css')}}" rel="stylesheet" />
 @endsection
+
 @section('content')
 <html>
     <body>
@@ -27,7 +28,6 @@
               <div class="grid-item text-center text-red"> <h6>{{$game->player1_score}}</h6> </div>
               <div class="grid-item text-center text-red"> <h6>{{$game->player2_score}}</h6> </div>
         </div>
-
 
         <div class="text-center pb-15">
             <a class="btn btn-primary"

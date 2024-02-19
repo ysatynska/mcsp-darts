@@ -10,7 +10,6 @@ function removeErrorMessage () {
     spotForError.removeChild(errorObject);
 }
 
-
 function generateError (errorMessage) {
     errorObject.textContent = errorMessage;
     spotForError.appendChild(linebreak);
@@ -33,7 +32,6 @@ function checkNameValidity(event) {
 //at least one score has to be >=21 and if both are >21, has to be a 2 point difference between two scores.
 function checkScoreValidity (event) {
     checkNameValidity(event);
-
     const score1 = document.querySelector("input[name='score1']").value;
     const score2 = document.querySelector("input[name='score2']").value;
 

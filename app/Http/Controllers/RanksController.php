@@ -18,30 +18,12 @@ class RanksController extends TemplateController
         parent::__construct();
     }
 
-    function convertToRanks ($row_ranks) {
-        $ranks = array();
-        $ordered_ranks = $row_ranks;
-        rsort($ordered_ranks);
-
-        foreach ($row_ranks as $key => $value) {
-            foreach ($ordered_ranks as $ordered_key => $ordered_value) {
-                if ($value === $ordered_value) {
-                    $key = $ordered_key;
-                    break;
-                }
-            }
-            $ranks[] = intval($key+1);
-        }
-        return $ranks;
-    }
-
     public function showRanks (Request $request) {
         $search = $request->search;
         $students_only = ($request->students_only === 'yes');
         $ranks = true;
 
         $last_updated = Player::orderBy('updated_at','DESC')->first()->updated_at->diffForHumans();
-        // ddd($last_updated->updated_at->format('g:ma'));
         if ($students_only){
             $student_ranks = Player::orderBy('rank_students', 'ASC')->where('is_student', true);
         } else {
