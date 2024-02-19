@@ -25,8 +25,8 @@ class TypeaheadController extends Controller
 
         $students = User::where(function ($query) {
                         $query->where('Faculty', 'Yes')
-                                ->orWhere('Staff', 'Yes')
-                                ->orWhere("Student", 'Yes');
+                               ->orWhere('Staff', 'Yes')
+                               ->orWhere("Student", 'Yes');
                         })
         ->where(function ($query) use ($search_terms) {
           foreach($search_terms as $term) {

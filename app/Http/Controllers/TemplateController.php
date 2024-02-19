@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\GamesController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\RanksController;
 use App\Models\User;
 use RCAuth;
 
@@ -18,10 +19,10 @@ class TemplateController extends Controller
         ];
 
         if (RCAuth::check() || RCAuth::attempt()) {
+            $side_navigation['<span class="fa-regular fa-ranking-star"></span> Ranks'] = action([RanksController::class, 'showRanks'], ['students_only' => 'yes']);
             $side_navigation['<span class="fa-regular fa-table-tennis-paddle-ball"></span> My Games'] = action([GamesController::class, 'myGames']);
 
             $rcid = RCAuth::user()->rcid;
-
             if ($rcid == '1285521' || $rcid == '1250537' || $rcid == '0248715' || $rcid == '0248715' || $rcid == '0003213') {
                 $side_navigation['<span class="far fa-list"></span> All Games'] = action([AdminController::class, 'allGames']);
             }

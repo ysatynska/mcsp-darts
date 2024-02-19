@@ -19,6 +19,10 @@
     <script defer src="{{URL::asset('assets/js/submitScore.js')}}"> </script>
 @endsection
 
+@section('javascript')
+    <script defer src="{{URL::asset('assets/js/submitScore.js')}}"> </script>
+@endsection
+
 @section('content')
     <html>
         @if(Session::get('error'))
@@ -32,17 +36,17 @@
         @endif
 
         <div class="text-center">
-            <h2 class="py-15"> Minton Invitational </h2>
+            <h3 class="py-15"> Minton Invitational </h3>
         </div>
         <form method="POST" action="{{ action([App\Http\Controllers\GamesController::class, 'saveScore']) }}">
             @csrf
-            <div class="grid-2 py-20">
+            <div class="grid-2 py-lg-20 pb-sm-10">
                 <div class="grid-item text-center">
                     <label>Player 1:
                         {!! MustangBuilder::typeaheadAjax("player1_name",
-                            action([App\Http\Controllers\TypeaheadController::class, 'user_search']), $user->display_name ,
+                            action([App\Http\Controllers\TypeaheadController::class, 'user_search']), $user->display_name,
                             array("input_data_name" => "input_data", "display_data_name"=>"display_data"),
-                            array("class"=>"typehead", "required" => true),
+                            array("class"=>"typehead text-center", "required" => true),
                             "new_person",
                             true)
                         !!}
@@ -54,7 +58,7 @@
                         {!! MustangBuilder::typeaheadAjax("player2_name",
                             action([App\Http\Controllers\TypeaheadController::class, 'user_search']), '' ,
                             array("input_data_name" => "input_data", "display_data_name"=>"display_data"),
-                            array("class"=>"typehead", "required" => true),
+                            array("class"=>"typehead text-center", "required" => true),
                             "new_person",
                             true)
                         !!}
@@ -63,12 +67,12 @@
                 </div>
                 <div class="grid-item text-center">
                     <label>Score 1: <br>
-                        <input class="form-control" type="number" name="score1" min="0" required>
+                        <input class="form-control text-center" type="number" name="score1" min="0" required>
                     </label>
                 </div>
                 <div class="grid-item text-center">
                     <label>Score 2: <br>
-                        <input class="form-control" type="number" name="score2" min="0" required>
+                        <input class="form-control text-center" type="number" name="score2" min="0" required>
                     </label>
                 </div>
             </div>
@@ -79,9 +83,9 @@
         </form>
     <hr>
 
-    <div class="grid-2 py-20">
+    <div class="grid-2 pt-lg-20 gap-8">
             <div class = "grid-item justify-self-center">
-                <h2>Rules</h2>
+                <h3 class="text-center">Rules</h3>
                 <ol>
                 <li>Game to 21, win by 2.</li>
                 <li>Each player gets 5 serves.</li>
@@ -89,10 +93,11 @@
                 </ol>
             </div>
         <div class="grid-item text-center">
-            <img src="{{URL::asset('MI.png')}}" alt="Roland Minton">
+            <img src="{{URL::asset('MI.png')}}" alt="Roland Minton" class="width-lg-65 width-sm-90">
         </div>
     </div>
 
+    @include('footer')
     </html>
 @endsection
 

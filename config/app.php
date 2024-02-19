@@ -67,7 +67,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'EST',
 
     /*
     |--------------------------------------------------------------------------
@@ -139,6 +139,7 @@ return [
         /*
          * Laravel Framework Service Providers...
          */
+
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Illuminate\Auth\AuthServiceProvider::class,
         Illuminate\Broadcasting\BroadcastServiceProvider::class,
@@ -178,7 +179,7 @@ return [
 
         rcwebdevelopers\mustangbuilder\MustangBuilderProvider::class,
         rcwebdevelopers\Auth\AuthServiceProvider::class,
-
+        'Laracasts\Utilities\JavaScript\JavaScriptServiceProvider',
     ],
 
     /*

@@ -19,9 +19,9 @@ class AdminController extends TemplateController
             $all_games->search($search);
         }
         $all_games = $all_games->paginate(14)->withQueryString();
-        $my_games = false;
+        $is_admin = true;
 
-        return view('adminoptions/allGames', ['all_games' => $all_games, 'my_games' => $my_games, 'search' => $search]);
+        return view('adminoptions/games', ['data' => $all_games, 'is_admin' => $is_admin, 'search' => $search]);
     }
 
     public function exportAll () {
@@ -30,25 +30,14 @@ class AdminController extends TemplateController
     }
 
     public function exportStudentOnly () {
-
         $games_students = Game::whereHas("player1", function ($query) {
-                                    $query->where('Student', 'Yes')->withoutGlobalScopes();
+                                    $query->where('is_student', true)->withoutGlobalScopes();
                                 })
                                 ->whereHas('player2', function ($query) {
-                                    $query->where('Student', 'Yes')->withoutGlobalScopes();
+                                    $query->where('is_student', true)->withoutGlobalScopes();
                                 })
                                 ->get();
 
         return \Excel::download(new GamesExport($games_students), 'Ping_Pong_All_Games_Data.xlsx');
     }
-
-
-    // public function searchGames (Request $request) {
-
-    //     $search = $request->search;
-    //     $my_games = false;
-    //     $shown = Game::->paginate(14)->withQueryString();
-
-    //     return view('adminoptions/allGames', ['all_games' => $shown, 'my_games' => $my_games, 'search' => $search]);
-    // }
 }

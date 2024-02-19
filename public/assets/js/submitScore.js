@@ -49,4 +49,4 @@ function checkScoreValidity (event) {
     }
 }
 
-form.addEventListener('submit', checkScoreValidity)
+form.addEventListener('submit', checkScoreValidity);

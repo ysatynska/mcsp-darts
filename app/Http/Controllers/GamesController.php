@@ -7,7 +7,10 @@ use Illuminate\Pagination\Paginator;
 use App\Models\Game;
 use RCAuth;
 use App\Models\User;
+use App\Models\Player;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
+require_once('assets/php/updateRanks.php');
 
 class GamesController extends TemplateController
 {
@@ -32,23 +35,24 @@ class GamesController extends TemplateController
         ]);
 
         $rcid = RCAuth::user()->rcid;
+
+        $player1 = Player::processPlayer($request->player1_id, $rcid);
+        $player2 = Player::processPlayer($request->player2_id, $rcid);
+
         $game = new Game ([
-            'player1_rcid' => $request->player1_id,
-            'player2_rcid' => $request->player2_id,
             'player1_score' => $request->score1,
             'player2_score' => $request->score2,
-            'player1_name' => $request->player1_name,
-            'player2_name' => $request->player2_name,
+            'fkey_player1' => $player1->id,
+            'fkey_player2' => $player2->id,
             'created_by' => $rcid,
             'updated_by' => $rcid
         ]);
 
         $game->save();
+        // run updateRanks async
+        $only_students = ($player1->is_student && $player2->is_student);
+        updateRanks($only_students);
 
-        return redirect()->action([GamesController::class, 'scoreRecorded'], ['game' => $game]);
-    }
-
-    public function scoreRecorded(Game $game){
         return view('scoreRecorded', ['game' => $game]);
     }
 
@@ -56,9 +60,13 @@ class GamesController extends TemplateController
         $search = $request->search;
         $rcid = RCAuth::user()->rcid;
 
-        $all_games = Game::where('player1_rcid', $rcid)
-                        ->orWhere('player2_rcid', $rcid)
-                        ->orderBy('created_at', 'DESC');
+        $all_games = Game::whereHas('player1', function ($query) use ($rcid) {
+                                $query->where('rcid', $rcid);
+                            })
+                            ->orWhereHas('player2', function ($query) use ($rcid) {
+                                $query->where('rcid', $rcid);
+                            })
+                            ->orderBy('created_at', 'DESC');
 
         if ($request->has('search')) {
             $all_games->search($search);
@@ -67,7 +75,7 @@ class GamesController extends TemplateController
         $all_games = $all_games->paginate(14)->withQueryString();
 
         $my_games = true;
-        return view('adminoptions/allGames',
-        ['all_games' => $all_games, 'my_games' => $my_games, 'my_rcid' => $rcid, 'search' => $search]);
+        return view('adminoptions/games',
+        ['data' => $all_games, 'my_games' => $my_games, 'my_rcid' => $rcid, 'search' => $search]);
     }
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\GamesController;
 use App\Http\Controllers\TypeaheadController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\RanksController;
 use App\Models\Game;
 /*
 |--------------------------------------------------------------------------
@@ -32,8 +33,9 @@ Route::middleware('force_login')->group(function () {
     Route::get('/', [GamesController::class, 'submitScore']);
     Route::post('storeScore', [GamesController::class, 'saveScore']);
     Route::get('finduser/', [TypeaheadController::class, 'user_search']);
-    Route::get('score_recorded/{game}', [GamesController::class, 'scoreRecorded']);
     Route::get('my_games', [GamesController::class, 'myGames']);
+    Route::get('ranks', [RanksController::class, 'showRanks']);
+    Route::get('update_ranks', [RanksController::class, 'updateRanks']);
 
     Route::prefix('adminoptions')->group(function(){
         Route::middleware('force_admin')->group(function () {
