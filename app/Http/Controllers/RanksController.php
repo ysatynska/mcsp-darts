@@ -23,7 +23,12 @@ class RanksController extends TemplateController
         $students_only = ($request->students_only === 'yes');
         $ranks = true;
 
-        $last_updated = Player::orderBy('updated_at','DESC')->first()->updated_at->diffForHumans();
+        if (!is_null(Player::first())) {
+            $last_updated = Player::orderBy('updated_at','DESC')->first()->updated_at->diffForHumans();
+        } else {
+            $last_updated = null;
+        }
+        
         if ($students_only){
             $student_ranks = Player::orderBy('rank_students', 'ASC')->where('is_student', true);
         } else {

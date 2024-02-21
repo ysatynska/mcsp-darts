@@ -24,7 +24,7 @@ class TemplateController extends Controller
 
             $rcid = RCAuth::user()->rcid;
             if ($rcid == '1285521' || $rcid == '1250537' || $rcid == '0248715' || $rcid == '0248715' || $rcid == '0003213') {
-                $side_navigation['<span class="far fa-list"></span> All Games'] = action([AdminController::class, 'allGames']);
+                $side_navigation['<span class="far fa-list"></span> All Games'] = action([AdminController::class, 'allGames'], ['students_only' => 'yes']);
             }
             $side_navigation['<span class="far fa-sign-out"></span> Logout '.RCAuth::user()->username] = route('logout');
         } else {

@@ -13,7 +13,18 @@ class AdminController extends TemplateController
 
     public function allGames (Request $request) {
         $search = $request->search;
-        $all_games = Game::query()->orderBy('created_at', 'DESC');
+        $students_only = ($request->students_only === 'yes');
+
+        if ($students_only) {
+            $all_games = Game::whereHas('player1', function ($query) {
+                                $query->where('is_student', true)->withoutGlobalScopes();
+                            })
+                            ->whereHas('player2', function ($query) {
+                                $query->where('is_student', true)->withoutGlobalScopes();
+                            })->orderBy('created_at', 'DESC');
+        } else {
+            $all_games = Game::orderBy('created_at', 'DESC');
+        }
 
         if ($request->has('search')) {
             $all_games->search($search);
@@ -21,7 +32,8 @@ class AdminController extends TemplateController
         $all_games = $all_games->paginate(14)->withQueryString();
         $is_admin = true;
 
-        return view('adminoptions/games', ['data' => $all_games, 'is_admin' => $is_admin, 'search' => $search]);
+        return view('adminoptions/games',
+        ['data' => $all_games, 'is_admin' => $is_admin, 'students_only' => $students_only, 'search' => $search]);
     }
 
     public function exportAll () {

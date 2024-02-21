@@ -64,7 +64,21 @@
                             All Players' Ranks
                         </a>
                     @else
-                        All Games
+                        <a onclick = "location.href =
+                            '{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'yes']) }}'"
+                            @if (!$students_only)
+                                style="color:gray; font-size:16px"
+                            @endif>
+                            Student Games
+                        </a>
+                        <br>
+                        <a onclick = "location.href =
+                            '{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'no']) }}'"
+                            @if ($students_only)
+                                style="color:gray; font-size:16px"
+                            @endif>
+                            All Games
+                        </a>
                     @endif
                 </h3>
             </div>
@@ -96,7 +110,7 @@
                     @if (isset($ranks))
                         <th scope="col" class="bold">Rank </th>
                         <th scope="col" class="bold">Name </th>
-                        <th scope="col" class="bold">Ranking </th>
+                        <th scope="col" class="bold">Rating </th>
                         <th scope="col" class="bold">Total Net Points</th>
                     @else
                         <th scope="col" class="bold">Date </th>
@@ -126,11 +140,12 @@
                         @endif
                         <td> {{$data_point->name}} </td>
                         @if ($students_only)
-                            <td> {{$data_point->ranking_students}} </td>
+                            <td> {{$data_point->rating_students}} </td>
+                            <td> {{$data_point->total_net_students}} </td>
                         @else
-                            <td> {{$data_point->ranking_all}} </td>
+                            <td> {{$data_point->rating_all}} </td>
+                            <td> {{$data_point->total_net_all}} </td>
                         @endif
-                        <td> {{$data_point->total_net}} </td>
                     @else
                         <td> {{$data_point->created_at->format('M j, g:ma')}} </td>
 
@@ -159,7 +174,7 @@
         <div class="grid-2 mb-0">
             <div class="grid-item align-self-center py-15">
                 @if (isset($ranks))
-                    <p style="color:gray; font-size:14px" class="mb-0">Last Updated: {{$last_updated}} </p>
+                    <p style="color:gray; font-size:14px" class="mb-0">Updated: {{$last_updated}} </p>
                 @elseif (isset($is_admin))
                     <a class = "btn btn-primary mb-2" name = "export" value="Export Excel"
                         onclick="location.href = '{{action([App\Http\Controllers\AdminController::class, 'exportStudentOnly'])}}'"
@@ -175,8 +190,8 @@
             </div>
         </div>
         @if (isset($ranks))
-            <p style="color:#197c8e" class="font-sm-12 font-17"><strong>Ranking:</strong> this is a calculated variable that predicts the outcome of future games betwen the players. If player A has ranking 15 and player B has ranking 23, player B is predicted to score 8 points more than player A. </p>
-            <p style="color:#197c8e" class="pb-20 font-sm-12 font-17"><strong>Total Net Points:</strong> this is a calculated variable showing the total number of points scored minus the total number of points lost by the player. This is just one of many variables affecting a player's rank. </p>
+            <p style="color:#197c8e" class="font-sm-12 font-17"><strong>Rating:</strong> predicts the outcome of future games betwen the players. If player A has rating 15 and player B has rating 23, player B is predicted to score 8 points more than player A. </p>
+            <p style="color:#197c8e" class="pb-20 font-sm-12 font-17"><strong>Total Net Points:</strong> shows the difference between the number of points scored and the number of points lost by the player across all games. This is just one of many variables affecting a player's rank. </p>
         @endif
     </div>
 </html>

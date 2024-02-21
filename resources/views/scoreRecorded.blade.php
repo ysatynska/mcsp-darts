@@ -36,6 +36,18 @@
                     name="home" value="home"> Submit Another Score
             </a>
         </div>
+        <div class="text-center pb-15">
+            <a class="btn btn-primary"
+                    onclick = "location.href =
+                    '{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'yes']) }}'"
+                    name="home" value="home"> View Ranks
+            </a>
+            <a class="btn btn-primary"
+                    onclick = "location.href =
+                    '{{ action([App\Http\Controllers\GamesController::class, 'myGames']) }}'"
+                    name="home" value="home"> View My Games
+            </a>
+        </div>
     </body>
 </html>
 @endsection

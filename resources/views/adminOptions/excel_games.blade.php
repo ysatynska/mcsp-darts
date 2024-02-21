@@ -1,10 +1,10 @@
 <table>
     <thead>
         <tr>
-            <th scope="col">Player1 </th>
-            <th scope="col">Player2 </th>
-            <th scope="col">Score1 </th>
-            <th scope="col">Score2 </th>
+            <th scope="col">Player 1 </th>
+            <th scope="col">Player 2 </th>
+            <th scope="col">Score 1 </th>
+            <th scope="col">Score 2 </th>
             <th scope="col">Date </th>
         </tr>
     </thead>
