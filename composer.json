@@ -21,7 +21,8 @@
         "maatwebsite/excel": "^3.1",
         "markrogoyski/math-php": "2.*",
         "rcwebdevelopers/mustangbuilder": "dev-master",
-        "roanokecollege/authentication": "*"
+        "roanokecollege/authentication": "*",
+        "supervisorphp/supervisor": "^4.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

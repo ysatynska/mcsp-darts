@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Models\Player;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-require_once('assets/php/updateRanks.php');
 
 class GamesController extends TemplateController
 {
@@ -68,7 +67,8 @@ class GamesController extends TemplateController
 
         // run these two async
         $this->updateTotalNet($player1, $player2, $game->player1_score, $game->player2_score, $only_students);
-        updateRanks($only_students);
+
+        \App\Jobs\updateRanks::dispatch($only_students);
 
         return view('scoreRecorded', ['game' => $game]);
     }

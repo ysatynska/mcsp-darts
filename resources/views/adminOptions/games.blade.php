@@ -98,7 +98,7 @@
                         <button id="search_btn" type="submit" class="btn btn-info">&nbsp<span class="far fa-search"></span>&nbsp</button>
                     </span>
                     </div>
-                    @isset($ranks)
+                    @isset($students_only)
                         <input type="hidden" name="students_only" value="{{$students_only ? "yes" : "no"}}" />
                     @endisset
                 </form>
@@ -147,7 +147,7 @@
                             <td> {{$data_point->total_net_all}} </td>
                         @endif
                     @else
-                        <td> {{$data_point->created_at->format('M j, g:ma')}} </td>
+                        <td> {{$data_point->created_at->format('M j, g:ia')}} </td>
 
                         @if (isset($my_games))
                             @if ($data_point->player1->rcid === $my_rcid)
@@ -191,7 +191,7 @@
         </div>
         @if (isset($ranks))
             <p style="color:#197c8e" class="font-sm-12 font-17"><strong>Rating:</strong> predicts the outcome of future games betwen the players. If player A has rating 15 and player B has rating 23, player B is predicted to score 8 points more than player A. </p>
-            <p style="color:#197c8e" class="pb-20 font-sm-12 font-17"><strong>Total Net Points:</strong> shows the difference between the number of points scored and the number of points lost by the player across all games. This is just one of many variables affecting a player's rank. </p>
+            <p style="color:#197c8e" class="pb-20 font-sm-12 font-17"><strong>Total Net Points:</strong> shows the difference between the number of points scored and the number of points lost by the player across all games. </p>
         @endif
     </div>
 </html>

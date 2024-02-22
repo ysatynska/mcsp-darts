@@ -78,8 +78,12 @@
                 </div>
             </div>
 
-            <div class="row text-center pt-0 pb-15 submit-button">
-                <input type='submit' class="btn btn-primary" value="Record Score">
+            <div class="row text-center pt-0 pb-5 submit-button">
+                <input type='submit' class="btn btn-primary mb-15" value="Record Score">
+                <br>
+                <a class = "btn btn-warning" name = "join_chat" value="Join Discord Chat"
+                    onclick="location.href = ''"
+                >Join Discord Chat</a>
             </div>
         </form>
         <hr>

@@ -9,18 +9,20 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
+
 class updateRanks implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private $only_students;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($only_students)
     {
-        //
+        $this->only_students = $only_students;
     }
 
     /**
@@ -30,6 +32,6 @@ class updateRanks implements ShouldQueue
      */
     public function handle()
     {
-        //
+        \App\Models\Player::updateRanks($this->only_students);
     }
 }

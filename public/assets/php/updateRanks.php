@@ -118,13 +118,3 @@ function calculateRanks ($players, $only_students) {
     $ranks = convertToRanks($rref->getColumn($players->count()));
     storeRanks($ranks, $players, $only_students);
 }
-
-function updateRanks ($only_students) {
-    $all_players = Player::all();
-    calculateRanks($all_players, false);
-
-    if ($only_students === true){
-        $student_players = Player::where('is_student', true)->get();
-        calculateRanks($student_players, true);
-    }
-}
