@@ -65,7 +65,6 @@ class GamesController extends TemplateController
 
         $only_students = ($player1->is_student && $player2->is_student);
 
-        // run these two async
         $this->updateTotalNet($player1, $player2, $game->player1_score, $game->player2_score, $only_students);
 
         \App\Jobs\updateRanks::dispatch($only_students);

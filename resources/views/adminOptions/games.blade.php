@@ -2,17 +2,17 @@
 
 @if (isset($my_games))
     @section('title')
-        My Games Records
+        My Games
     @endsection
     @section('heading')
-        My Games Records
+        My Games
     @endsection
 @elseif (isset($ranks))
     @section('title')
         @if ($students_only)
             Students' Ranks
         @else
-            All Players' Ranks
+            All Ranks
         @endif
     @endsection
     @section('heading')
@@ -24,10 +24,18 @@
     @endsection
 @else
     @section('title')
-        All Games Records
+        @if ($students_only)
+            Student Games
+        @else
+            All Games
+        @endif
     @endsection
     @section('heading')
-        All Games Records
+        @if ($students_only)
+            Student Games
+        @else
+            All Games
+        @endif
     @endsection
 @endif
 
