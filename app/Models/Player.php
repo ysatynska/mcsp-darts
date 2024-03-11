@@ -21,7 +21,7 @@ class Player extends Model
         return $this->hasOne(User::class, 'RCID', 'rcid');
     }
 
-    public function processPlayer($player_rcid, $submitter_rcid) {
+    public static function processPlayer($player_rcid, $submitter_rcid) {
         $player = Player::where('rcid', $player_rcid)->first();
         if (empty($player->id)) {
             $user = User::find($player_rcid);
@@ -96,7 +96,7 @@ class Player extends Model
 
     private static function storeRanks ($ranks, $players, $only_students) {
         $index = 0;
-        if ($only_students === true){
+        if ($only_students){
             foreach ($players as $player) {
                 $player->rank_students = intval($ranks[$index]);
                 $index+=1;

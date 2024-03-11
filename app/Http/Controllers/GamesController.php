@@ -13,10 +13,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class GamesController extends TemplateController
 {
-    public function __construct(){
-        parent::__construct();
-    }
-
     public function submitScore() {
         $user = User::find(RCAuth::user()->rcid);
         return view('submitScore', ['user' => $user]);
@@ -75,20 +71,22 @@ class GamesController extends TemplateController
     public function myGames (Request $request) {
         $search = $request->search;
         $rcid = RCAuth::user()->rcid;
-        $all_games = Game::whereHas('player1', function ($query) use ($rcid) {
-                                $query->where('rcid', $rcid);
-                            })
-                            ->orWhereHas('player2', function ($query) use ($rcid) {
-                                $query->where('rcid', $rcid);
-                            })
-                            ->orderBy('created_at', 'DESC');
+        $all_games = Game::where(function ($query) use ($rcid) {
+                            $query->whereHas('player1', function ($query) use ($rcid) {
+                                        $query->where('rcid', $rcid);
+                                    })
+                                    ->orWhereHas('player2', function ($query) use ($rcid) {
+                                        $query->where('rcid', $rcid);
+                                    });
+                            })->orderBy('created_at', 'DESC');
         if ($request->has('search')) {
             $all_games->search($search);
         }
-        $all_games = $all_games->paginate(14)->withQueryString();
+        $all_games = $all_games->paginate(env("PAGE_NUMBER"))->withQueryString();
         $my_games = true;
 
+        $search_action = action([GamesController::class, 'myGames']);
         return view('adminoptions/games',
-        ['data' => $all_games, 'my_games' => $my_games, 'my_rcid' => $rcid, 'search' => $search]);
+        ['data' => $all_games, 'my_games' => $my_games, 'my_rcid' => $rcid, 'search' => $search, 'search_action' => $search_action]);
     }
 }

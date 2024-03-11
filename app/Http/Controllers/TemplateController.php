@@ -23,7 +23,9 @@ class TemplateController extends Controller
             $side_navigation['<span class="fa-regular fa-table-tennis-paddle-ball"></span> My Games'] = action([GamesController::class, 'myGames']);
 
             $rcid = RCAuth::user()->rcid;
-            if ($rcid == '1285521' || $rcid == '1250537' || $rcid == '0248715' || $rcid == '0248715' || $rcid == '0003213') {
+            $admin_users = explode(", ", env("ADMIN_USERS"));
+
+            if (in_array($rcid, $admin_users)) {
                 $side_navigation['<span class="far fa-list"></span> All Games'] = action([AdminController::class, 'allGames'], ['students_only' => 'yes']);
             }
             $side_navigation['<span class="far fa-sign-out"></span> Logout '.RCAuth::user()->username] = route('logout');

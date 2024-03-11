@@ -13,27 +13,22 @@ class AdminController extends TemplateController
 
     public function allGames (Request $request) {
         $search = $request->search;
-        $students_only = ($request->students_only === 'yes');
+        $students_only = $request->boolean('students_only');
 
+        $all_games = Game::orderBy('created_at', 'DESC');
         if ($students_only) {
-            $all_games = Game::whereHas('player1', function ($query) {
-                                $query->where('is_student', true)->withoutGlobalScopes();
-                            })
-                            ->whereHas('player2', function ($query) {
-                                $query->where('is_student', true)->withoutGlobalScopes();
-                            })->orderBy('created_at', 'DESC');
-        } else {
-            $all_games = Game::orderBy('created_at', 'DESC');
+            $all_games = $all_games->studentPlayers();
         }
 
         if ($request->has('search')) {
             $all_games->search($search);
         }
-        $all_games = $all_games->paginate(14)->withQueryString();
+        $all_games = $all_games->paginate(env("PAGE_NUMBER"))->withQueryString();
         $is_admin = true;
 
+        $search_action = action([AdminController::class, 'allGames']);
         return view('adminoptions/games',
-        ['data' => $all_games, 'is_admin' => $is_admin, 'students_only' => $students_only, 'search' => $search]);
+        ['data' => $all_games, 'is_admin' => $is_admin, 'students_only' => $students_only, 'search' => $search, 'search_action' => $search_action]);
     }
 
     public function exportAll () {
@@ -42,13 +37,7 @@ class AdminController extends TemplateController
     }
 
     public function exportStudentOnly () {
-        $games_students = Game::whereHas("player1", function ($query) {
-                                    $query->where('is_student', true)->withoutGlobalScopes();
-                                })
-                                ->whereHas('player2', function ($query) {
-                                    $query->where('is_student', true)->withoutGlobalScopes();
-                                })
-                                ->get();
+        $games_students = Game::orderBy('created_at', 'DESC')->studentPlayers()->get();
         return \Excel::download(new GamesExport($games_students), 'pingpong_students.xlsx');
     }
 }

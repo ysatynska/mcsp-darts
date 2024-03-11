@@ -28,7 +28,7 @@ class RanksController extends TemplateController
         } else {
             $last_updated = null;
         }
-        
+
         if ($students_only){
             $student_ranks = Player::orderBy('rank_students', 'ASC')->where('is_student', true);
         } else {
@@ -39,9 +39,10 @@ class RanksController extends TemplateController
             $student_ranks->search($search);
         }
 
-        $student_ranks = $student_ranks->paginate(14)->withQueryString();
+        $student_ranks = $student_ranks->paginate(env("PAGE_NUMBER"))->withQueryString();
 
+        $search_action = action([RanksController::class, 'showRanks'], ['students_only' => $request->students_only]);
         return view('adminoptions/games',
-        ['data' => $student_ranks, 'ranks' => $ranks, 'search' => $search, 'students_only' => $students_only, 'last_updated' => $last_updated]);
+        ['data' => $student_ranks, 'ranks' => $ranks, 'search' => $search, 'students_only' => $students_only, 'last_updated' => $last_updated, 'search_action' => $search_action]);
     }
 }

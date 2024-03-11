@@ -46,7 +46,7 @@ class TypeaheadController extends Controller
           $response_entry                 = [];
           $response_entry['id']           = $student->RCID;
           $response_entry['display_data'] = view()->make("typeahead.typeahead", ['person' => $student])->render();
-          $response_entry['input_data']   = $student->natural_name;//Because that's what it was in the old typeahead
+          $response_entry['input_data']   = $student->rc_full_name; //Because that's what it was in the old typeahead
           $response[]                     = $response_entry;
         }
 

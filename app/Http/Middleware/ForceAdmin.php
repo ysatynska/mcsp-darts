@@ -25,8 +25,8 @@ class ForceAdmin
 
         if (!is_null($rcid)){
 
-            // Childers, Liz, Scotty, Michael, Weselcouch
-            if ($rcid == '1285521' || $rcid == '1250537' || $rcid == '0732787' || $rcid == '0248715' || $rcid == '0003213')
+            $admin_users = explode(", ", env("ADMIN_USERS"));
+            if (in_array($rcid, $admin_users))
             {
                 $returnRoute = $next($request);
 

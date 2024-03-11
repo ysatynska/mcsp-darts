@@ -35,15 +35,18 @@ function checkScoreValidity (event) {
     const score1 = document.querySelector("input[name='score1']").value;
     const score2 = document.querySelector("input[name='score2']").value;
 
-    if (score1 < 21 && score2 < 21) {
+    if (Math.min(score1, score2) < 0) {
+        event.preventDefault();
+        generateError('Scores have to be over 0.');
+    } else if (Math.max(score1, score2) < 21) {
         event.preventDefault();
         generateError('At least one of the scores has to be over 21.');
-    } else if (score1 > 20 && score2 > 20 && Math.abs(score1-score2) < 2) {
+    } else if (Math.abs(score1, score2) < 2) {
         event.preventDefault();
-        generateError('There has to be at least two point difference between the scores.');
-    } else if ((score1 > 21 && (score1-score2) > 2) || (score2 > 21 && (score2-score1) > 2)) {
+        generateError('The difference between scores has to be at least 2');
+    } else if (Math.max(score1, score2) > 21 && Math.abs(score1, score2) > 2) {
         event.preventDefault();
-        generateError('Games have to be to 21.');
+        generateError('The difference between these scores has to be 2');
     }
 }
 

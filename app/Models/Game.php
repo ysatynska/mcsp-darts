@@ -43,4 +43,13 @@ class Game extends Model
       public function player2 () {
         return $this->hasOne(Player::class, 'id', 'fkey_player2');
       }
+
+      public function scopeStudentPlayers (Builder $query) {
+        $query->whereHas('player1', function ($query) {
+            $query->where('is_student', true);
+        })
+        ->whereHas('player2', function ($query) {
+            $query->where('is_student', true);
+        });
+      }
 }
