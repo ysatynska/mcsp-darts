@@ -237,5 +237,6 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
     ],
-
+    'admin_users' => explode(', ', env("ADMIN_USERS", '')),
+    'entries_per_page' => env("PAGE_NUMBER")
 ];

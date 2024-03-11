@@ -25,8 +25,7 @@ class ForceAdmin
 
         if (!is_null($rcid)){
 
-            $admin_users = explode(", ", env("ADMIN_USERS"));
-            if (in_array($rcid, $admin_users))
+            if (in_array($rcid, config('app.admin_users', [])))
             {
                 $returnRoute = $next($request);
 

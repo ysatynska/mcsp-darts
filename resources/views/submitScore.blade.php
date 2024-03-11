@@ -38,7 +38,7 @@
     @csrf
     <div class="grid-2 py-lg-20 pb-sm-10">
         <div class="grid-item text-center">
-            <label>Player 1:
+            <label>Player 1
                 {!! MustangBuilder::typeaheadAjax("player1_name",
                     action([App\Http\Controllers\TypeaheadController::class, 'user_search']), $user->display_name,
                     array("input_data_name" => "input_data", "display_data_name"=>"display_data"),
@@ -50,7 +50,7 @@
             </label>
         </div>
         <div class="grid-item text-center">
-            <label>Player 2:
+            <label>Player 2
                 {!! MustangBuilder::typeaheadAjax("player2_name",
                     action([App\Http\Controllers\TypeaheadController::class, 'user_search']), old('player2_name'),
                     array("input_data_name" => "input_data", "display_data_name"=>"display_data"),
@@ -62,12 +62,12 @@
             </label>
         </div>
         <div class="grid-item text-center">
-            <label>Score 1: <br>
+            <label>Score 1 <br>
                 <input class="form-control text-center" type="number" name="score1" min="0" value="{{old('score1')}}" required>
             </label>
         </div>
         <div class="grid-item text-center">
-            <label>Score 2: <br>
+            <label>Score 2 <br>
                 <input class="form-control text-center" type="number" name="score2" min="0" value="{{old('score2')}}" required>
             </label>
         </div>

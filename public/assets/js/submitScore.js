@@ -34,17 +34,19 @@ function checkScoreValidity (event) {
     checkNameValidity(event);
     const score1 = document.querySelector("input[name='score1']").value;
     const score2 = document.querySelector("input[name='score2']").value;
-
-    if (Math.min(score1, score2) < 0) {
+    const lost_score = Math.min(score1, score2);
+    const won_score = Math.max(score1, score2);
+    const difference = won_score - lost_score;
+    if (lost_score < 0) {
         event.preventDefault();
         generateError('Scores have to be over 0.');
-    } else if (Math.max(score1, score2) < 21) {
+    } else if (won_score < 21) {
         event.preventDefault();
         generateError('At least one of the scores has to be over 21.');
-    } else if (Math.abs(score1, score2) < 2) {
+    } else if (difference < 2) {
         event.preventDefault();
         generateError('The difference between scores has to be at least 2');
-    } else if (Math.max(score1, score2) > 21 && Math.abs(score1, score2) > 2) {
+    } else if (won_score > 21 && difference > 2) {
         event.preventDefault();
         generateError('The difference between these scores has to be 2');
     }
