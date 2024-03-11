@@ -77,7 +77,7 @@
         <input type='submit' class="btn btn-primary mb-15" value="Record Score">
         <br>
         <a class = "btn btn-warning" name = "join_chat" value="Join Discord Server"
-            onclick="location.href = 'https://discord.gg/SzbJs9aS'"
+            href = 'https://discord.gg/SzbJs9aS'
         >Join Discord Server</a>
     </div>
 </form>

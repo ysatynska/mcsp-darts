@@ -170,11 +170,11 @@
                 <p style="color:gray; font-size:14px" class="mb-0">Updated: {{$last_updated}} </p>
             @elseif (isset($is_admin))
                 <a class = "btn btn-primary mb-2" name = "export" value="Export Excel"
-                    onclick="location.href = '{{action([App\Http\Controllers\AdminController::class, 'exportStudentOnly'])}}'"
+                    href = '{{action([App\Http\Controllers\AdminController::class, 'exportStudentOnly'])}}'
                 >Export Students Only</a>
 
                 <a class = "btn btn-primary mb-2" name = "export" value="Export Excel"
-                    onclick="location.href = '{{action([App\Http\Controllers\AdminController::class, 'exportAll'])}}'"
+                    href = '{{action([App\Http\Controllers\AdminController::class, 'exportAll'])}}'
                 >Export All</a>
             @endif
         </div>
