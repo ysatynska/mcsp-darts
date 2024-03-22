@@ -131,7 +131,7 @@
                     @else
                         <td> {{$data_point->rank_all}} </td>
                     @endif
-                    <td> {{$data_point->name}} </td>
+                    <td> {{$data_point->user->rc_full_name}} </td>
                     @if ($students_only)
                         <td> {{$data_point->rating_students}} </td>
                         <td> {{$data_point->total_net_students}} </td>
@@ -144,17 +144,17 @@
 
                     @if (isset($my_games))
                         @if ($data_point->player1->rcid === $my_rcid)
-                            <td> {{$data_point->player2->name}} </td>
+                            <td> {{$data_point->player2->user->rc_full_name}} </td>
                             <td> {{$data_point->player2_score}} </td>
                             <td> {{$data_point->player1_score}} </td>
                         @else
-                            <td> {{$data_point->player1->name}} </td>
+                            <td> {{$data_point->player1->user->rc_full_name}} </td>
                             <td> {{$data_point->player1_score}} </td>
                             <td> {{$data_point->player2_score}} </td>
                         @endif
                     @else
-                        <td> {{$data_point->player1->name}} </td>
-                        <td> {{$data_point->player2->name}} </td>
+                        <td> {{$data_point->player1->user->rc_full_name}} </td>
+                        <td> {{$data_point->player2->user->rc_full_name}} </td>
                         <td> {{$data_point->player1_score}} </td>
                         <td> {{$data_point->player2_score}} </td>
                     @endif

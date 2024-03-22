@@ -14,12 +14,6 @@ class User extends Model
 
     public function getDisplayNameAttribute()
     {
-        $first_name = $this->FirstName;
-
-        if (! empty($this->Nickname)) {
-            $first_name = $this->Nickname;
-        }
-
-        return sprintf('%s %s', trim($first_name), trim($this->LastName));
+        return $this->rc_full_name;
     }
 }

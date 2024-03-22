@@ -10,11 +10,12 @@ use App\Models\Player;
 
 class Game extends Model
 {
-    protected $table = "ysatynska_training.dbo.pp_games_ys";
+    protected $table = "AcademicAffairsOperations.mcsp_pingpong.games";
     protected $primaryKey = "id";
 
     protected $fillable = ['fkey_player1', 'fkey_player2', 'player1_score', 'player2_score', 'created_by', 'updated_by'];
     protected $dates = ['deleted_at'];
+    protected $with = ['player1', 'player2'];
 
     public function scopeSearch(Builder $query, $search_term) {
         if (!empty($search_term)) {
@@ -25,11 +26,11 @@ class Game extends Model
                 });
             } else {
                 $query->where(function ($query) use ($search_term) {
-                    $query->whereHas('player1', function ($query) use ($search_term) {
-                        $query->where('name', 'LIKE', sprintf('%%%s%%', $search_term));
+                    $query->whereHas('player1.user', function ($query) use ($search_term) {
+                        $query->where('rc_full_name', 'LIKE', sprintf('%%%s%%', $search_term));
                     })
-                    ->orWhereHas('player2', function ($query) use ($search_term) {
-                        $query->where('name', 'LIKE', sprintf('%%%s%%', $search_term));
+                    ->orWhereHas('player2.user', function ($query) use ($search_term) {
+                        $query->where('rc_full_name', 'LIKE', sprintf('%%%s%%', $search_term));
                     });
                 });
             }

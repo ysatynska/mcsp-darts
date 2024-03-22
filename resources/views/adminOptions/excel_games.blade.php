@@ -11,8 +11,8 @@
     <tbody>
         @foreach ($games as $game)
         <tr>
-            <td> {{$game->player1->name}} </td>
-            <td> {{$game->player2->name}} </td>
+            <td> {{$game->player1->user->rc_full_name}} </td>
+            <td> {{$game->player2->user->rc_full_name}} </td>
             <td> {{$game->player1_score}} </td>
             <td> {{$game->player2_score}} </td>
             <td> {{$game->created_at}} </td>

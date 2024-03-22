@@ -23,8 +23,8 @@
         </div>
 
         <div class="grid-2 pb-20 pt-10 gap-0 mb-0">
-              <div class="grid-item text-center align-self-center bold pt-serif-pro"> <h5>{{$game->player1->name}}</h5> </div>
-              <div class="grid-item text-center align-self-center bold pt-serif-pro"> <h5>{{$game->player2->name}}</h5> </div>
+              <div class="grid-item text-center align-self-center bold pt-serif-pro"> <h5>{{$game->player1->user->rc_full_name}}</h5> </div>
+              <div class="grid-item text-center align-self-center bold pt-serif-pro"> <h5>{{$game->player2->user->rc_full_name}}</h5> </div>
               <div class="grid-item text-center text-red"> <h6>{{$game->player1_score}}</h6> </div>
               <div class="grid-item text-center text-red"> <h6>{{$game->player2_score}}</h6> </div>
         </div>

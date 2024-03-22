@@ -11,11 +11,12 @@ use MathPHP\LinearAlgebra\MatrixFactory;
 
 class Player extends Model
 {
-    protected $table = "ysatynska_training.dbo.pp_players_ys";
+    protected $table = "AcademicAffairsOperations.mcsp_pingpong.players";
     protected $primaryKey = "id";
 
-    protected $fillable = ['name', 'rcid', 'net_points', 'is_student', 'rank', 'created_by', 'updated_by'];
+    protected $fillable = ['rcid', 'net_points', 'is_student', 'rank', 'created_by', 'updated_by'];
     protected $dates = ['deleted_at'];
+    protected $with = ['user'];
 
     public function user () {
         return $this->hasOne(User::class, 'RCID', 'rcid');
@@ -26,7 +27,6 @@ class Player extends Model
         if (empty($player->id)) {
             $user = User::find($player_rcid);
             $player = new Player ([
-                'name' => $user->display_name,
                 'rcid' => $player_rcid,
                 'is_student' => ($user->Student === 'Yes'),
                 'created_by' => $submitter_rcid,
@@ -45,8 +45,8 @@ class Player extends Model
                           ->orWhere('rank', $search_term);
                 });
             } else {
-                $query->where(function ($query) use ($search_term) {
-                    $query->where('name', 'LIKE', sprintf('%%%s%%', $search_term));
+                $query->whereHas("user", function ($query) use ($search_term) {
+                    $query->where('rc_full_name', 'LIKE', sprintf('%%%s%%', $search_term));
                 });
             }
         }
