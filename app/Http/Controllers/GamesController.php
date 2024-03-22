@@ -86,7 +86,7 @@ class GamesController extends TemplateController
         $my_games = true;
 
         $search_action = action([GamesController::class, 'myGames']);
-        return view('adminoptions/games',
+        return view('adminOptions/games',
         ['data' => $all_games, 'my_games' => $my_games, 'my_rcid' => $rcid, 'search' => $search, 'search_action' => $search_action]);
     }
 }

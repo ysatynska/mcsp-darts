@@ -27,7 +27,7 @@ class AdminController extends TemplateController
         $is_admin = true;
 
         $search_action = action([AdminController::class, 'allGames']);
-        return view('adminoptions/games',
+        return view('adminOptions/games',
         ['data' => $all_games, 'is_admin' => $is_admin, 'students_only' => $students_only, 'search' => $search, 'search_action' => $search_action]);
     }
 

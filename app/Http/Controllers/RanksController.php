@@ -42,7 +42,7 @@ class RanksController extends TemplateController
         $student_ranks = $student_ranks->paginate(env("PAGE_NUMBER"))->withQueryString();
 
         $search_action = action([RanksController::class, 'showRanks'], ['students_only' => $request->students_only]);
-        return view('adminoptions/games',
+        return view('adminOptions/games',
         ['data' => $student_ranks, 'ranks' => $ranks, 'search' => $search, 'students_only' => $students_only, 'last_updated' => $last_updated, 'search_action' => $search_action]);
     }
 }
