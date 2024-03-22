@@ -67,7 +67,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'EST',
 
     /*
     |--------------------------------------------------------------------------
@@ -139,6 +139,8 @@ return [
         /*
          * Laravel Framework Service Providers...
          */
+
+        Maatwebsite\Excel\ExcelServiceProvider::class,
         Illuminate\Auth\AuthServiceProvider::class,
         Illuminate\Broadcasting\BroadcastServiceProvider::class,
         Illuminate\Bus\BusServiceProvider::class,
@@ -177,7 +179,7 @@ return [
 
         rcwebdevelopers\mustangbuilder\MustangBuilderProvider::class,
         rcwebdevelopers\Auth\AuthServiceProvider::class,
-
+        'Laracasts\Utilities\JavaScript\JavaScriptServiceProvider',
     ],
 
     /*
@@ -235,5 +237,6 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
     ],
-
+    'admin_users' => explode(', ', env("ADMIN_USERS", '')),
+    'entries_per_page' => env("PAGE_NUMBER")
 ];

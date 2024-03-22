@@ -1,0 +1,24 @@
+tr {
+    height: 31px;
+}
+
+td, thead tr th {
+    padding: 0 .5em 0 .5em !important;
+    height: 50px;
+}
+
+table tr:nth-child(even) {
+    background-color: #e2f0fc;
+}
+
+table tr:hover {
+    background-color: #ddd;
+}
+
+th, tr {
+    border-bottom: 1px solid #cedfee;
+}
+
+table {
+    width: 100%;
+}
