@@ -63,8 +63,7 @@ class GamesController extends TemplateController
 
         $this->updateTotalNet($player1, $player2, $game->player1_score, $game->player2_score, $only_students);
 
-        // \App\Jobs\updateRanks::dispatch($only_students);
-        Player::updateRanks($only_students);
+        \App\Jobs\updateRanks::dispatch($only_students);
 
         return view('scoreRecorded', ['game' => $game]);
     }

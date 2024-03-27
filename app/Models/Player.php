@@ -24,10 +24,19 @@ class Player extends Model
     }
 
     public function numGamesPlayed ($students_only) {
-        $allGamesPlayed = Game::where(function ($query) {
-
+        $rcid = $this->rcid;
+        $all_games = Game::where (function ($query) use ($rcid) {
+                            $query->whereHas('player1', function ($query) use ($rcid) {
+                                    $query->where('rcid', $rcid);
+                                })
+                                ->orWhereHas('player2', function ($query) use ($rcid) {
+                                    $query->where('rcid', $rcid);
                                 });
-        return 0;
+                            });
+        if ($students_only) {
+            $all_games = $all_games->studentPlayers();
+        }
+        return $all_games->count();
     }
 
     public static function processPlayer($player_rcid, $submitter_rcid) {
@@ -146,13 +155,13 @@ class Player extends Model
         $index = 0;
         if ($only_students){
             foreach ($players as $player) {
-                $player->rating_students = round($ratings[$index], 3);
+                $player->rating_students = number_format($ratings[$index], 2, '.', '');
                 $index+=1;
                 $player->update();
             }
         } else {
             foreach ($players as $player) {
-                $player->rating_all = round($ratings[$index], 3);
+                $player->rating_all = number_format($ratings[$index], 2, '.', '');
                 $index+=1;
                 $player->update();
             }

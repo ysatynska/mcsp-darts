@@ -62,21 +62,21 @@
                         Students' Ranks
                     </a>
                     <br>
-                    <a href='{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'no']) }}'
+                    <a href='{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'no', 'search' => $search]) }}'
                         @if ($students_only)
                             style="color:gray; font-size:16px"
                         @endif>
                         All Players' Ranks
                     </a>
                 @else
-                    <a href='{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'yes']) }}'
+                    <a href='{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'yes', 'search' => $search]) }}'
                         @if (!$students_only)
                             style="color:gray; font-size:16px"
                         @endif>
                         Student Games
                     </a>
                     <br>
-                    <a href='{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'no']) }}'
+                    <a href='{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'no', 'search' => $search]) }}'
                         @if ($students_only)
                             style="color:gray; font-size:16px"
                         @endif>
@@ -105,20 +105,20 @@
                 @if (isset($ranks))
                     <th scope="col" class="bold">Rank</th>
                     <th scope="col" class="bold">Name</th>
-                    <th scope="col" class="bold">Rating</th>
-                    <th scope="col" class="bold">Total Net Points</th>
-                    <th scope="col" class="bold">Games Played</th>
+                    <th scope="col" class="bold numericTd">Rating</th>
+                    <th scope="col" class="bold numericTd">Total Net</th>
+                    <th scope="col" class="bold numericTd">Games Played</th>
                 @else
                     <th scope="col" class="bold">Date </th>
                     @if (isset($my_games))
                         <th scope="col" class="bold">Opponent </th>
-                        <th scope="col" class="bold">Their Score </th>
-                        <th scope="col" class="bold">My Score</th>
+                        <th scope="col" class="bold numericTd">Their Score </th>
+                        <th scope="col" class="bold numericTd">My Score</th>
                     @else
                         <th scope="col" class="bold">Player 1 </th>
                         <th scope="col" class="bold">Player 2 </th>
-                        <th scope="col" class="bold">Score 1 </th>
-                        <th scope="col" class="bold">Score 2 </th>
+                        <th scope="col" class="bold numericTd">Score 1 </th>
+                        <th scope="col" class="bold numericTd">Score 2 </th>
                     @endif
                 @endif
             </tr>
@@ -134,31 +134,31 @@
                     @endif
                     <td> {{$data_point->user->rc_full_name}} </td>
                     @if ($students_only)
-                        <td> {{$data_point->rating_students}} </td>
-                        <td> {{$data_point->total_net_students}} </td>
+                        <td class="numericTd"> {{$data_point->rating_students}} </td>
+                        <td class="numericTd"> {{$data_point->total_net_students}} </td>
                     @else
-                        <td> {{$data_point->rating_all}} </td>
-                        <td> {{$data_point->total_net_all}} </td>
+                        <td class="numericTd"> {{$data_point->rating_all}} </td>
+                        <td class="numericTd"> {{$data_point->total_net_all}} </td>
                     @endif
-                    <td> {{$data_point->numGamesPlayed($students_only)}} </td>
+                    <td class="numericTd"> {{$data_point->numGamesPlayed($students_only)}} </td>
                 @else
                     <td> {{$data_point->created_at->format('M j, g:ia')}} </td>
 
                     @if (isset($my_games))
                         @if ($data_point->player1->rcid === $my_rcid)
                             <td> {{$data_point->player2->user->rc_full_name}} </td>
-                            <td> {{$data_point->player2_score}} </td>
-                            <td> {{$data_point->player1_score}} </td>
+                            <td class="numericTd"> {{$data_point->player2_score}} </td>
+                            <td class="numericTd"> {{$data_point->player1_score}} </td>
                         @else
                             <td> {{$data_point->player1->user->rc_full_name}} </td>
-                            <td> {{$data_point->player1_score}} </td>
-                            <td> {{$data_point->player2_score}} </td>
+                            <td class="numericTd"> {{$data_point->player1_score}} </td>
+                            <td class="numericTd"> {{$data_point->player2_score}} </td>
                         @endif
                     @else
                         <td> {{$data_point->player1->user->rc_full_name}} </td>
                         <td> {{$data_point->player2->user->rc_full_name}} </td>
-                        <td> {{$data_point->player1_score}} </td>
-                        <td> {{$data_point->player2_score}} </td>
+                        <td class="numericTd"> {{$data_point->player1_score}} </td>
+                        <td class="numericTd"> {{$data_point->player2_score}} </td>
                     @endif
                 @endif
             </tr>
