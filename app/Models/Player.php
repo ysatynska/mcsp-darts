@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\User;
+use App\Models\Game;
 use MathPHP\LinearAlgebra\Matrix;
 use MathPHP\LinearAlgebra\MatrixFactory;
 
@@ -20,6 +21,13 @@ class Player extends Model
 
     public function user () {
         return $this->hasOne(User::class, 'RCID', 'rcid');
+    }
+
+    public function numGamesPlayed ($students_only) {
+        $allGamesPlayed = Game::where(function ($query) {
+
+                                });
+        return 0;
     }
 
     public static function processPlayer($player_rcid, $submitter_rcid) {
@@ -138,13 +146,13 @@ class Player extends Model
         $index = 0;
         if ($only_students){
             foreach ($players as $player) {
-                $player->rating_students = intval(round($ratings[$index]));
+                $player->rating_students = round($ratings[$index], 3);
                 $index+=1;
                 $player->update();
             }
         } else {
             foreach ($players as $player) {
-                $player->rating_all = intval(round($ratings[$index]));
+                $player->rating_all = round($ratings[$index], 3);
                 $index+=1;
                 $player->update();
             }

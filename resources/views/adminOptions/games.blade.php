@@ -103,10 +103,11 @@
         <thead>
             <tr>
                 @if (isset($ranks))
-                    <th scope="col" class="bold">Rank </th>
-                    <th scope="col" class="bold">Name </th>
-                    <th scope="col" class="bold">Rating </th>
+                    <th scope="col" class="bold">Rank</th>
+                    <th scope="col" class="bold">Name</th>
+                    <th scope="col" class="bold">Rating</th>
                     <th scope="col" class="bold">Total Net Points</th>
+                    <th scope="col" class="bold">Games Played</th>
                 @else
                     <th scope="col" class="bold">Date </th>
                     @if (isset($my_games))
@@ -139,6 +140,7 @@
                         <td> {{$data_point->rating_all}} </td>
                         <td> {{$data_point->total_net_all}} </td>
                     @endif
+                    <td> {{$data_point->numGamesPlayed($students_only)}} </td>
                 @else
                     <td> {{$data_point->created_at->format('M j, g:ia')}} </td>
 
