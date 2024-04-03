@@ -18,7 +18,7 @@ class updateRanks implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @return void
+     * @return void 
      */
     public function __construct($only_students)
     {

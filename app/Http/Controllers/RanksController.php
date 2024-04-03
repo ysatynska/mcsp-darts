@@ -30,7 +30,7 @@ class RanksController extends TemplateController
         }
 
         if ($students_only){
-            $student_ranks = Player::orderBy('rank_students', 'ASC')->where('is_student', true);
+            $student_ranks = Player::orderBy('rank_students', 'ASC')->where('is_student', true)->where('rank_students', '!=', null);
         } else {
             $student_ranks = Player::orderBy('rank_all', 'ASC');
         }

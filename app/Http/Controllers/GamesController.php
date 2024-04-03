@@ -9,6 +9,7 @@ use RCAuth;
 use App\Models\User;
 use App\Models\Player;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 
 
 class GamesController extends TemplateController
@@ -62,9 +63,9 @@ class GamesController extends TemplateController
         $only_students = ($player1->is_student && $player2->is_student);
 
         $this->updateTotalNet($player1, $player2, $game->player1_score, $game->player2_score, $only_students);
-
+        Log::debug('Adding job to update ranks.');
         \App\Jobs\updateRanks::dispatch($only_students);
-
+        Log::debug('Finished adding job to update ranks.');
         return view('scoreRecorded', ['game' => $game]);
     }
 
