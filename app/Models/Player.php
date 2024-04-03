@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Game;
 use MathPHP\LinearAlgebra\Matrix;
 use MathPHP\LinearAlgebra\MatrixFactory;
+use Illuminate\Support\Facades\Log;
 
 class Player extends Model
 {
@@ -106,8 +107,10 @@ class Player extends Model
             }
             $one_player_array[] = $player_net_points;
             $matrix[] = $one_player_array;
+            Log::debug('One player: ' . $one_player_array . "Students only: " . $only_students . "Player: ". $player->id);
         }
         $math_matrix = MatrixFactory::create($matrix);
+        Log::debug('Matrix: ' . $math_matrix . "Students only: " . $only_students);
         return ($math_matrix->rref());
     }
 
@@ -170,6 +173,7 @@ class Player extends Model
 
     private static function calculateRanks ($players, $only_students) {
         $rref = self::getRREF($players, $only_students);
+        Log::debug('RREF: ' . $rref . "Students only: " . $only_students);
         $ratings = self::addMinValue($rref->getColumn($players->count()));
         self::storeRatings($ratings, $players, $only_students);
         $ranks = self::convertToRanks($rref->getColumn($players->count()));
@@ -177,6 +181,7 @@ class Player extends Model
     }
 
     public static function updateRanks ($only_students) {
+        Log::debug('Updating ranks. Students only: ' . $only_students);
         $all_players = Player::all();
         self::calculateRanks($all_players, false);
 
