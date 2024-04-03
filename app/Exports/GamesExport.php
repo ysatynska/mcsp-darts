@@ -21,7 +21,7 @@ class GamesExport implements FromView, ShouldAutoSize, WithStyles
   */
   public function view () : View
   {
-    return view("adminoptions.excel_games", ["games" => $this->games]);
+    return view("adminOptions.excel_games", ["games" => $this->games]);
   }
 
   public function styles (Worksheet $sheet) {
