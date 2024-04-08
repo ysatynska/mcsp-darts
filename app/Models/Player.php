@@ -22,7 +22,7 @@ class Player extends Model
         return $this->hasOne(User::class, 'RCID', 'rcid');
     }
 
-    public function numGamesPlayed ($students_only) {
+    public function gamesPlayed ($students_only) {
         $rcid = $this->rcid;
         $all_games = Game::where (function ($query) use ($rcid) {
                             $query->whereHas('player1', function ($query) use ($rcid) {
@@ -35,7 +35,11 @@ class Player extends Model
         if ($students_only) {
             $all_games = $all_games->studentPlayers();
         }
-        return $all_games->count();
+        return $all_games->get();
+    }
+
+    public function numGamesPlayed ($students_only) {
+        return $this->gamesPlayed($students_only)->count();
     }
 
     public static function processPlayer($player_rcid, $submitter_rcid) {
@@ -53,6 +57,29 @@ class Player extends Model
         return $player;
     }
 
+    public function updateTotalNet ($only_students) {
+        $gamesPlayed = $this->gamesPlayed($only_students);
+        $pointsFor = 0;
+        $pointsAgainst = 0;
+
+        foreach ($gamesPlayed as $game) {
+            if ((int)$game->fkey_player1 === $this->id) {
+                $pointsFor += $game->player1_score;
+                $pointsAgainst += $game->player2_score;
+            } else {
+                $pointsFor += $game->player2_score;
+                $pointsAgainst += $game->player1_score;
+            }
+        }
+
+        if ($only_students) {
+            $this->total_net_students = $pointsFor - $pointsAgainst;
+        } else {
+            $this->total_net_all = $pointsFor - $pointsAgainst;
+        }
+        $this->update();
+    }
+
     public function scopeSearch(Builder $query, $search_term) {
         if (!empty($search_term)) {
             if (is_numeric($search_term)) {
@@ -66,7 +93,7 @@ class Player extends Model
                 });
             }
         }
-      }
+    }
 
     private static function getRREF($players, $only_students) {
         foreach ($players as $player) {
@@ -175,11 +202,16 @@ class Player extends Model
         self::storeRanks($ranks, $players, $only_students);
     }
 
-    public static function updateRanks ($only_students) {
+    public static function updateRanks ($only_students, Player $player1, Player $player2) {
+        $player1->updateTotalNet(false);
+        $player2->updateTotalNet(false);
+
         $all_players = Player::all();
         self::calculateRanks($all_players, false);
 
-        if ($only_students === true){
+        if ($only_students){
+            $player1->updateTotalNet(true);
+            $player2->updateTotalNet(true);
             $student_players = Player::where('is_student', true)->get();
             self::calculateRanks($student_players, true);
         }

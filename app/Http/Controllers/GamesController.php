@@ -19,21 +19,6 @@ class GamesController extends TemplateController
         return view('submitScore', ['user' => $user]);
     }
 
-    private function updateTotalNet ($player1, $player2, $score1, $score2, $only_students) {
-        $diff = $score1 - $score2;
-
-        $player1->total_net_all = $player1->total_net_all + $diff;
-        $player2->total_net_all = $player2->total_net_all - $diff;
-
-        if ($only_students) {
-            $player1->total_net_students = $player1->total_net_students + $diff;
-            $player2->total_net_students = $player2->total_net_students - $diff;
-        }
-
-        $player1->update();
-        $player2->update();
-    }
-
     public function saveScore(Request $request) {
         $request->validate([
             'player1_id' => ['required', 'string', 'max:10'],
@@ -57,14 +42,10 @@ class GamesController extends TemplateController
             'created_by' => $rcid,
             'updated_by' => $rcid
         ]);
-
         $game->save();
 
         $only_students = ($player1->is_student && $player2->is_student);
-
-        $this->updateTotalNet($player1, $player2, $game->player1_score, $game->player2_score, $only_students);
-
-        \App\Jobs\updateRanks::dispatch($only_students);
+        \App\Jobs\updateRanks::dispatch($only_students, $player1, $player2);
 
         return view('scoreRecorded', ['game' => $game]);
     }
