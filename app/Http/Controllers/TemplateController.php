@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\GamesController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\RanksController;
-use App\Models\User;
 use RCAuth;
 
 class TemplateController extends Controller

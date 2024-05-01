@@ -46,8 +46,77 @@
 @section('stylesheets')
     <link href="{{URL::asset('assets/css/allGames.css')}}" rel="stylesheet" />
     <link href="{{URL::asset('assets/css/tables.css')}}" rel="stylesheet" />
+    <link href="{{URL::asset('assets/css/weather.css')}}" rel="stylesheet" />
+@endsection
+
+@section('javascript')
+    <script>
+        function getCookie(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for(var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+        $(document).ready(function() {
+            $('#header').append($('#weather-toggle'));
+            $('#weather-toggle').show();
+            var tempScale = getCookie("temp-scale");
+            if (tempScale == 'C') {
+                $('#c-toggle').addClass('active');
+                $('#degree-c').show();
+            }
+            else {
+                $('#f-toggle').addClass('active');
+                $('#degree-f').show();
+            }
+        });
+        $(document).on("click", "#f-toggle", function () {
+            $(this).addClass('active');
+            $('#c-toggle').removeClass('active');
+            $('#degree-c').hide();
+            $('#degree-f').show();
+            document.cookie = "temp-scale=F";
+        });
+        $(document).on("click", "#c-toggle", function () {
+            $(this).addClass('active');
+            $('#f-toggle').removeClass('active');
+            $('#degree-f').hide();
+            $('#degree-c').show();
+            document.cookie = "temp-scale=C";
+        });
+    </script>
 @endsection
 @section('content')
+@include('weather')
+<div id="tactical-nav" class="tactical-nav-menu">
+    <ul>
+        @foreach ($all_terms as $term)
+            <li>
+                @if (isset($my_games))
+                    <a href="{{ action([App\Http\Controllers\GamesController::class, 'myGames'], ['term' => $term]) }}" style="background-color: {{$term == $current_term ? 'rgb(245, 245, 245)' : ''}}">
+                        {{$term}}
+                    </a>
+                @elseif (isset($ranks))
+                    <a href="{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => $students_only, 'term' => $term]) }}" style="background-color: {{$term == $current_term ? 'rgb(245, 245, 245)' : ''}}">
+                        {{$term}}
+                    </a>
+                @else
+                    <a href="{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => $students_only, 'term' => $term]) }}" style="background-color: {{$term == $current_term ? 'rgb(245, 245, 245)' : ''}}">
+                        {{$term}}
+                    </a>
+                @endif
+            </li>
+        @endforeach
+    </ul>
+</div>
 <div>
     <div class="grid-2 mb-10">
         <div class="grid-item align-self-center">
@@ -55,28 +124,28 @@
                 @if (isset($my_games))
                     My Games
                 @elseif (isset($ranks))
-                    <a href='{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'yes']) }}'
+                    <a href='{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'yes', 'search' => $search, 'term' => $current_term]) }}'
                         @if (!$students_only)
                             style="color:gray; font-size:16px"
                         @endif>
                         Students' Ranks
                     </a>
                     <br>
-                    <a href='{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'no', 'search' => $search]) }}'
+                    <a href='{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'no', 'search' => $search, 'term' => $current_term]) }}'
                         @if ($students_only)
                             style="color:gray; font-size:16px"
                         @endif>
                         All Players' Ranks
                     </a>
                 @else
-                    <a href='{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'yes', 'search' => $search]) }}'
+                    <a href='{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'yes', 'search' => $search, 'term' => $current_term]) }}'
                         @if (!$students_only)
                             style="color:gray; font-size:16px"
                         @endif>
                         Student Games
                     </a>
                     <br>
-                    <a href='{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'no', 'search' => $search]) }}'
+                    <a href='{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'no', 'search' => $search, 'term' => $current_term]) }}'
                         @if ($students_only)
                             style="color:gray; font-size:16px"
                         @endif>
@@ -88,11 +157,12 @@
         <div class="grid-item justify-self-end align-self-center">
             <form id="search-form" method="GET" action={!!$search_action!!}>
                 <div class="input-group">
-                <input type="text" placeholder="Name or Score" class="form-control width100" name="search" id="search" value="{{ $search ?? "" }}" />
-                <span class="input-group-btn">
-                    <button id="search_btn" type="submit" class="btn btn-info">&nbsp<span class="far fa-search"></span>&nbsp</button>
-                </span>
+                    <input type="text" placeholder="Name or Score" class="form-control width100" name="search" id="search" value="{{ $search ?? "" }}" />
+                    <span class="input-group-btn">
+                        <button id="search_btn" type="submit" class="btn btn-info">&nbsp<span class="far fa-search"></span>&nbsp</button>
+                    </span>
                 </div>
+                <input type="hidden" name="term" value="{{$current_term}}" />
                 @isset($students_only)
                     <input type="hidden" name="students_only" value="{{$students_only ? "yes" : "no"}}" />
                 @endisset
@@ -125,43 +195,43 @@
         </thead>
         <tbody>
             @foreach ($data as $data_point)
-            <tr>
-                @if (isset($ranks))
-                    @if ($students_only)
-                        <td> {{$data_point->rank_students}} </td>
+                <tr>
+                    @if (isset($ranks))
+                        @if ($students_only)
+                            <td> {{$data_point->rank_students}} </td>
+                        @else
+                            <td> {{$data_point->rank_all}} </td>
+                        @endif
+                        <td> {{$data_point->user->rc_full_name}} </td>
+                        @if ($students_only)
+                            <td class="numericTd"> {{$data_point->rating_students}} </td>
+                            <td class="numericTd"> {{$data_point->total_net_students}} </td>
+                        @else
+                            <td class="numericTd"> {{$data_point->rating_all}} </td>
+                            <td class="numericTd"> {{$data_point->total_net_all}} </td>
+                        @endif
+                        <td class="numericTd"> {{$data_point->numGamesPlayed($students_only)}} </td>
                     @else
-                        <td> {{$data_point->rank_all}} </td>
-                    @endif
-                    <td> {{$data_point->user->rc_full_name}} </td>
-                    @if ($students_only)
-                        <td class="numericTd"> {{$data_point->rating_students}} </td>
-                        <td class="numericTd"> {{$data_point->total_net_students}} </td>
-                    @else
-                        <td class="numericTd"> {{$data_point->rating_all}} </td>
-                        <td class="numericTd"> {{$data_point->total_net_all}} </td>
-                    @endif
-                    <td class="numericTd"> {{$data_point->numGamesPlayed($students_only)}} </td>
-                @else
-                    <td> {{$data_point->created_at->format('M j, g:ia')}} </td>
+                        <td> {{$data_point->created_at->format('M j, g:ia')}} </td>
 
-                    @if (isset($my_games))
-                        @if ($data_point->player1->rcid === $my_rcid)
-                            <td> {{$data_point->player2->user->rc_full_name}} </td>
-                            <td class="numericTd"> {{$data_point->player2_score}} </td>
-                            <td class="numericTd"> {{$data_point->player1_score}} </td>
+                        @if (isset($my_games))
+                            @if ($data_point->player1->rcid === $my_rcid)
+                                <td> {{$data_point->player2->user->rc_full_name}} </td>
+                                <td class="numericTd"> {{$data_point->player2_score}} </td>
+                                <td class="numericTd"> {{$data_point->player1_score}} </td>
+                            @else
+                                <td> {{$data_point->player1->user->rc_full_name}} </td>
+                                <td class="numericTd"> {{$data_point->player1_score}} </td>
+                                <td class="numericTd"> {{$data_point->player2_score}} </td>
+                            @endif
                         @else
                             <td> {{$data_point->player1->user->rc_full_name}} </td>
+                            <td> {{$data_point->player2->user->rc_full_name}} </td>
                             <td class="numericTd"> {{$data_point->player1_score}} </td>
                             <td class="numericTd"> {{$data_point->player2_score}} </td>
                         @endif
-                    @else
-                        <td> {{$data_point->player1->user->rc_full_name}} </td>
-                        <td> {{$data_point->player2->user->rc_full_name}} </td>
-                        <td class="numericTd"> {{$data_point->player1_score}} </td>
-                        <td class="numericTd"> {{$data_point->player2_score}} </td>
                     @endif
-                @endif
-            </tr>
+                </tr>
             @endforeach
         </tbody>
     </table>
@@ -172,11 +242,11 @@
                 <p style="color:gray; font-size:14px" class="mb-0">Updated: {{$last_updated}} </p>
             @elseif (isset($is_admin))
                 <a class = "btn btn-primary mb-2" name = "export" value="Export Excel"
-                    href = '{{action([App\Http\Controllers\AdminController::class, 'exportStudentOnly'])}}'
+                    href = '{{action([App\Http\Controllers\AdminController::class, 'exportStudentOnly'], ['term' => $current_term])}}'
                 >Export Students Only</a>
 
                 <a class = "btn btn-primary mb-2" name = "export" value="Export Excel"
-                    href = '{{action([App\Http\Controllers\AdminController::class, 'exportAll'])}}'
+                    href = '{{action([App\Http\Controllers\AdminController::class, 'exportAll'], ['term' => $current_term])}}'
                 >Export All</a>
             @endif
         </div>

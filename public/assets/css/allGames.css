@@ -146,3 +146,7 @@ li {
 .footer-container {
     overflow: hidden;
 }
+
+#tactical-nav {
+    margin-bottom: 10px;
+}

@@ -44,7 +44,17 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
-
+        'DailyEmail' => [
+            'driver' => 'sqlsrv',
+            'host' => env('DB_HOST', 'localhost'),
+            'database' => env('DAILY_DATABASE', 'forge'),
+            'username' => env('DAILY_USERNAME', 'forge'),
+            'password' => env('DAILY_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'pooling'  => false,
+            'trust_server_certificate' => true,
+        ],
     ],
 
     /*

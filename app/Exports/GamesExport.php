@@ -12,21 +12,23 @@ use \App\Models\Game;
 
 class GamesExport implements FromView, ShouldAutoSize, WithStyles
 {
-  public function __construct ($games) {
-    $this->games = $games;
-  }
+    private $games;
 
-  /**
-  * @return \Illuminate\Support\View
-  */
-  public function view () : View
-  {
-    return view("adminOptions.excel_games", ["games" => $this->games]);
-  }
+    public function __construct ($games) {
+        $this->games = $games;
+    }
 
-  public function styles (Worksheet $sheet) {
-    return [
-      1 => ['font' => ['bold' => true]]
-    ];
-  }
+    /**
+     * @return \Illuminate\Support\View
+    */
+    public function view () : View
+    {
+        return view("adminOptions.excel_games", ["games" => $this->games]);
+    }
+
+    public function styles (Worksheet $sheet) {
+        return [
+        1 => ['font' => ['bold' => true]]
+        ];
+    }
 }

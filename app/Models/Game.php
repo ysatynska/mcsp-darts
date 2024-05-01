@@ -13,7 +13,7 @@ class Game extends Model
     protected $table = "AcademicAffairsOperations.mcsp_pingpong.games";
     protected $primaryKey = "id";
 
-    protected $fillable = ['fkey_player1', 'fkey_player2', 'player1_score', 'player2_score', 'created_by', 'updated_by'];
+    protected $fillable = ['fkey_player1', 'fkey_player2', 'player1_score', 'player2_score', 'term', 'created_by', 'updated_by'];
     protected $dates = ['deleted_at'];
     protected $with = ['player1', 'player2'];
 

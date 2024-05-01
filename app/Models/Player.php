@@ -14,7 +14,7 @@ class Player extends Model
     protected $table = "AcademicAffairsOperations.mcsp_pingpong.players";
     protected $primaryKey = "id";
 
-    protected $fillable = ['rcid', 'net_points', 'is_student', 'rank', 'created_by', 'updated_by'];
+    protected $fillable = ['rcid', 'net_points', 'is_student', 'rank', 'term', 'created_by', 'updated_by'];
     protected $dates = ['deleted_at'];
     protected $with = ['user'];
 
@@ -42,13 +42,14 @@ class Player extends Model
         return $this->gamesPlayed($students_only)->count();
     }
 
-    public static function processPlayer($player_rcid, $submitter_rcid) {
-        $player = Player::where('rcid', $player_rcid)->first();
+    public static function processPlayer($player_rcid, $submitter_rcid, $current_term) {
+        $player = Player::where('rcid', $player_rcid)->where('term', $current_term)->first();
         if (empty($player->id)) {
             $user = User::find($player_rcid);
             $player = new Player ([
                 'rcid' => $player_rcid,
                 'is_student' => ($user->Student === 'Yes'),
+                'term' => $current_term,
                 'created_by' => $submitter_rcid,
                 'updated_by' => $submitter_rcid
             ]);
@@ -202,7 +203,7 @@ class Player extends Model
         self::storeRanks($ranks, $players, $only_students);
     }
 
-    public static function updateRanks ($only_students, Player $player1, Player $player2) {
+    public static function updateRanks ($only_students, Player $player1, Player $player2, $current_term) {
         $player1->updateTotalNet(false);
         $player2->updateTotalNet(false);
 

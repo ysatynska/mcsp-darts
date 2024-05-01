@@ -19,7 +19,7 @@
 <html>
     <body>
         <div class="text-center">
-            <h3> Score Submitted! </h3>
+            <h3> Score Recorded! </h3>
         </div>
 
         <div class="grid-2 pb-20 pt-10 gap-0 mb-0">

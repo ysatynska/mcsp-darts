@@ -13,22 +13,68 @@
 
 @section('stylesheets')
     <link href="{{URL::asset('assets/css/submitScore.css')}}" rel="stylesheet" />
+    <link href="{{URL::asset('assets/css/weather.css')}}" rel="stylesheet" />
 @endsection
 
 @section('javascript')
     <script defer src="{{URL::asset('assets/js/submitScore.js')}}"> </script>
+    <script>
+        function getCookie(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for(var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+        $(document).ready(function() {
+            $('#header').append($('#weather-toggle'));
+            $('#weather-toggle').show();
+            var tempScale = getCookie("temp-scale");
+            if (tempScale == 'C') {
+                $('#c-toggle').addClass('active');
+                $('#degree-c').show();
+            }
+            else {
+                $('#f-toggle').addClass('active');
+                $('#degree-f').show();
+            }
+        });
+        $(document).on("click", "#f-toggle", function () {
+            $(this).addClass('active');
+            $('#c-toggle').removeClass('active');
+            $('#degree-c').hide();
+            $('#degree-f').show();
+            document.cookie = "temp-scale=F";
+        });
+        $(document).on("click", "#c-toggle", function () {
+            $(this).addClass('active');
+            $('#f-toggle').removeClass('active');
+            $('#degree-f').hide();
+            $('#degree-c').show();
+            document.cookie = "temp-scale=C";
+        });
+    </script>
 @endsection
 
 @section('content')
-@if(Session::get('error'))
+@include('weather')
+@if(Session::get('error') || $errors->any())
     <div class="row">
         <div class="col-12">
         <div class="alert alert-danger light">
-            <p>{{ Session::get('error') }}</p>
+            <p>{{ Session::get('error') }} {!! implode('', $errors->all('<div>:message</div>')) !!}</p>
         </div>
         </div>
     </div>
 @endif
+@php $tournMode = substr($current_term, -1) === 'T' @endphp
 
 <div class="text-center">
     <h3 class="py-15"> Minton Invitational </h3>
@@ -74,10 +120,25 @@
     </div>
 
     <div class="row text-center pt-0 pb-5 submit-button">
+        @if ($is_admin)
+            <label for="term">Admin Options - Term</label>
+            <br>
+            <input list="existing_terms" id="term" name="term" placeholder="{{$current_term}}" class="text-center mb-15" autocomplete="off">
+            <datalist id="existing_terms">
+                @foreach ($all_terms as $term)
+                    <option value="{{$term}}">
+                @endforeach
+            </datalist>
+            <br>
+            <label style="color: rgb(167, 45, 45)">If you wish to {{$tournMode ? 'end' : 'start'}} a tournament, please use '{{$tournMode ? substr($current_term, 0, -1) : $current_term.'T'}}' as the format for the term.</label>
+            <br>
+            <label style="color: rgb(167, 45, 45)" class='mb-15'>If you submit a game for any term other than '{{$current_term}}', all subsequent games will be recorded under that new term.</label>
+            <br>
+        @endif
         <input type='submit' class="btn btn-primary mb-15" value="Record Score">
         <br>
         <a class = "btn btn-warning" name = "join_chat" value="Join Discord Server"
-            href = "https://discord.gg/UMPE8zm8"
+            href = "https://discord.gg/UCYV3AVYZr"
         >Join Discord Server</a>
     </div>
 </form>

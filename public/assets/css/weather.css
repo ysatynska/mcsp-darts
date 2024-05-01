@@ -1,0 +1,85 @@
+.icon {
+    display: none;
+    color: rgba(0,0,0,.6);
+}
+.weather {
+    color: #00000070;
+    font-style: italic;
+    margin-top: 10px;
+    text-align: right;
+    line-height: initial;
+}
+.weather a:hover {
+    text-decoration: none;
+}
+.weather-details {
+    font-size: 15px !important;
+    color: 'white';
+}
+#degree-f, #degree-c {
+    display: none;
+}
+#weather-toggle {
+    display: block;
+    position: absolute;
+    margin-right: 2.5em;
+    padding-right: 20px;
+    top: 0px;
+    right: 10px;
+}
+.temp {
+    font-size: 2em;
+    position: absolute;
+    right: -20px;
+    top: 20px;
+    color: rgba(181, 181, 181, 0.919);
+    cursor: pointer;
+}
+.temp:nth-child(2) {
+    top: 50px;
+}
+.active {
+    font-weight: 600;
+    color: rgb(134, 200, 235);
+}
+.visibilty {
+    padding-left: 10px;
+}
+@media(max-width: 1600px) and (min-width: 601px) {
+    .temp {
+      font-size: 1.4em;
+      right: -20px;
+      top: 10px;
+      cursor: pointer;
+    }
+    .temp:nth-child(2) {
+      top: 30px;
+    }
+}
+@media(max-width: 1000px) {
+    .weather-icon {
+      width: 20px;
+      height: 20px;
+    }
+    .weather {
+      font-size: .8em;
+      text-align: right;
+      margin-top: 0;
+    }
+    .temp {
+      position: absolute;
+      right: -5px;
+      top: 0px;
+      cursor: pointer;
+      font-size: 1.8em;
+    }
+    .temp:nth-child(2) {
+      top: 0px;
+      right: -25px;
+    }
+}
+@media(max-width: 770px) {
+    #weather-toggle {
+      display: none;
+    }
+}
