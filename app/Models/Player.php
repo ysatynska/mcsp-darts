@@ -22,26 +22,6 @@ class Player extends Model
         return $this->hasOne(User::class, 'RCID', 'rcid');
     }
 
-    public function gamesPlayed ($students_only) {
-        $rcid = $this->rcid;
-        $all_games = Game::where (function ($query) use ($rcid) {
-                            $query->whereHas('player1', function ($query) use ($rcid) {
-                                    $query->where('rcid', $rcid);
-                                })
-                                ->orWhereHas('player2', function ($query) use ($rcid) {
-                                    $query->where('rcid', $rcid);
-                                });
-                            });
-        if ($students_only) {
-            $all_games = $all_games->studentPlayers();
-        }
-        return $all_games->get();
-    }
-
-    public function numGamesPlayed ($students_only) {
-        return $this->gamesPlayed($students_only)->count();
-    }
-
     public static function processPlayer($player_rcid, $submitter_rcid, $current_term) {
         $player = Player::where('rcid', $player_rcid)->where('term', $current_term)->first();
         if (empty($player->id)) {
@@ -58,7 +38,56 @@ class Player extends Model
         return $player;
     }
 
-    public function updateTotalNet ($only_students) {
+    public function gamesPlayed ($students_only) {
+        $player_id = $this->id;
+        $all_games = Game::where('fkey_player1', $player_id)
+                            ->orWhere('fkey_player2', $player_id);
+        if ($students_only) {
+            $all_games = $all_games->studentPlayers();
+        }
+        return $all_games->orederBy('created_at', 'DESC')->get();
+    }
+
+    public function numGamesPlayed ($students_only) {
+        return $this->gamesPlayed($students_only)->count();
+    }
+
+    public function numUniqueOpponents ($students_only) {
+        $opponents = array();
+        $games = $this->gamesPlayed($students_only);
+        foreach ($games as $game) {
+            if ((int)$game->fkey_player1 === $this->id) {
+                $opponents[] = $game->fkey_player2;
+            } else {
+                $opponents[] = $game->fkey_player1;
+            }
+        }
+        return count(array_unique($opponents));
+    }
+
+    public function numGamesStreak ($only_students) {
+        $games = $this->gamesPlayed($only_students);
+        // games are sorted in descending order by the creation date
+        $streak = 0;
+        foreach ($games as $game) {
+            if ((int)$game->fkey_player1 === $this->id) {
+                if ($game->player1_score > $game->player2_score) {
+                    $streak += 1;
+                } else {
+                    $streal -= 1;
+                }
+            } else {
+                if ($game->player2_score > $game->player1_score) {
+                    $streak += 1;
+                } else {
+                    $streak -= 1;
+                }
+            }
+        }
+        return $streak;
+    }
+
+    public function updateTotalNet ($only_students, $current_term) {
         $gamesPlayed = $this->gamesPlayed($only_students);
         $pointsFor = 0;
         $pointsAgainst = 0;
@@ -98,42 +127,38 @@ class Player extends Model
 
     private static function getRREF($players, $only_students) {
         foreach ($players as $player) {
-            $total_num_games = Game::where(function ($query) use ($player) {
-                                        $query->where('fkey_player1', $player->id)
-                                            ->orWhere('fkey_player2', $player->id);
-                                    });
-            if ($only_students) {
-                $total_num_games = $total_num_games->where(function ($query) {
-                                                        $query->whereHas('player1', function ($query) {
-                                                            $query->where('is_student', true);
-                                                        })
-                                                        ->whereHas('player2', function ($query) {
-                                                            $query->where('is_student', true);
-                                                        });
-                                                    });
-            }
-            $total_num_games = $total_num_games->count();
+            // $total_num_games = Game::where('fkey_player1', $player->id)
+            //                         ->orWhere('fkey_player2', $player->id);
+            // if ($only_students) {
+            //     $total_num_games = $total_num_games->studentPlayers();
+            // }
+            // $total_num_games = $total_num_games->count();
+            $total_num_games = $player->numGamesPlayed($only_students);
 
             $player_net_points = ($only_students ? $player->total_net_students : $player->total_net_all);
             $one_player_array = array();
             foreach ($players as $opponent) {
                 if ($opponent->id !== $player->id){
                     $num_games_opponent = Game::where(function ($query) use ($player, $opponent){
-                                                $query->where('fkey_player1', $player->id)
-                                                    ->where('fkey_player2', $opponent->id);
-                                            })
-                                            ->orWhere(function ($query) use ($player, $opponent) {
-                                                $query->where('fkey_player2', $player->id)
-                                                    ->where('fkey_player1', $opponent->id);
-                                            })->count();
+                                                    $query->where('fkey_player1', $player->id)
+                                                        ->where('fkey_player2', $opponent->id);
+                                                })
+                                                ->orWhere(function ($query) use ($player, $opponent) {
+                                                    $query->where('fkey_player2', $player->id)
+                                                        ->where('fkey_player1', $opponent->id);
+                                                })->count();
                     $one_player_array[] = (-1) * $num_games_opponent;
                 } else {
                     $one_player_array[] = $total_num_games;
                 }
             }
             $one_player_array[] = $player_net_points;
+            // dump($player->id);
+            // dump($player->user->rc_full_name);
+            // dump($one_player_array);
             $matrix[] = $one_player_array;
         }
+        // dump($matrix);
         $math_matrix = MatrixFactory::create($matrix);
         return ($math_matrix->rref());
     }
@@ -197,24 +222,53 @@ class Player extends Model
 
     private static function calculateRanks ($players, $only_students) {
         $rref = self::getRREF($players, $only_students);
+        // dump($rref);
         $ratings = self::addMinValue($rref->getColumn($players->count()));
+        // dump($ratings);
         self::storeRatings($ratings, $players, $only_students);
         $ranks = self::convertToRanks($rref->getColumn($players->count()));
         self::storeRanks($ranks, $players, $only_students);
+        // if($only_students){
+        //     ddd($ranks);
+        // }
     }
 
     public static function updateRanks ($only_students, Player $player1, Player $player2, $current_term) {
-        $player1->updateTotalNet(false);
-        $player2->updateTotalNet(false);
+        // LOG::
+        $player1->updateTotalNet(false, $current_term);
+        $player2->updateTotalNet(false, $current_term);
 
-        $all_players = Player::all();
-        self::calculateRanks($all_players, false);
+        $all_players = Player::where('term', $current_term)->get()
+                                ->filter(function ($player) {
+                                    if ($player->numUniqueOpponents(false) <= 3) {
+                                        $player->rating_all = -1;
+                                        $player->rank_all = -1;
+                                        $player->update();
+                                        return false;
+                                    }
+                                    return true;
+                                });
+        // not considering players that played less than 4 unique people to make sure the matrix is closed.
+        if ($all_players->count() > 0) {
+            self::calculateRanks($all_players, false);
+        }
 
         if ($only_students){
-            $player1->updateTotalNet(true);
-            $player2->updateTotalNet(true);
-            $student_players = Player::where('is_student', true)->get();
-            self::calculateRanks($student_players, true);
+            $player1->updateTotalNet(true, $current_term);
+            $player2->updateTotalNet(true, $current_term);
+            $student_players = Player::where('term', $current_term)->where('is_student', true)->get()
+                                        ->filter(function ($player) {
+                                            if ($player->numUniqueOpponents(true) <= 3) {
+                                                $player->rating_students = -1;
+                                                $player->rank_students = -1;
+                                                $player->update();
+                                                return false;
+                                            }
+                                            return true;
+                                        });
+            if ($student_players->count() > 0) {
+                self::calculateRanks($student_players, true);
+            }
         }
     }
 }

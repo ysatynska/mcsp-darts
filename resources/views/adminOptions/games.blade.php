@@ -202,7 +202,10 @@
                         @else
                             <td> {{$data_point->rank_all}} </td>
                         @endif
-                        <td> {{$data_point->user->rc_full_name}} </td>
+                        <td> {{$data_point->user->rc_full_name}}
+                            @if ($data_point->getNumGamesStreak($only_students))
+                            @endif
+                        </td>
                         @if ($students_only)
                             <td class="numericTd"> {{$data_point->rating_students}} </td>
                             <td class="numericTd"> {{$data_point->total_net_students}} </td>

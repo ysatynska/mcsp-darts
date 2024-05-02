@@ -53,7 +53,8 @@ class GamesController extends TemplateController
         $game->save();
 
         $only_students = ($player1->is_student && $player2->is_student);
-        \App\Jobs\updateRanks::dispatch($only_students, $player1, $player2, $current_term);
+        Player::updateRanks($only_students, $player1, $player2, $current_term);
+        // \App\Jobs\updateRanks::dispatch($only_students, $player1, $player2, $current_term);
 
         $weather = Weather::orderByDesc('created_at')->first();
         return view('scoreRecorded', ['game' => $game, 'weather' => $weather]);
