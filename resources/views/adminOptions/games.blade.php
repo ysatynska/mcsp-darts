@@ -47,6 +47,7 @@
     <link href="{{URL::asset('assets/css/allGames.css')}}" rel="stylesheet" />
     <link href="{{URL::asset('assets/css/tables.css')}}" rel="stylesheet" />
     <link href="{{URL::asset('assets/css/weather.css')}}" rel="stylesheet" />
+    <link href="{{URL::asset('assets/css/open-weather-icons.css')}}" rel="stylesheet" />
 @endsection
 
 @section('javascript')
@@ -202,8 +203,14 @@
                         @else
                             <td> {{$data_point->rank_all}} </td>
                         @endif
-                        <td> {{$data_point->user->rc_full_name}}
-                            @if ($data_point->getNumGamesStreak($only_students))
+                        <td>
+                            {{$data_point->user->rc_full_name}}
+                            @php $gameStreak = $data_point->numGamesStreak($students_only) @endphp
+                            @if ($gameStreak >= 3)
+                                <span style="color:#a13535; font-weight: 700; font-size: 14px">
+                                    {{$gameStreak}}-game streak
+                                    <i class="fa-sharp fa-solid fa-fire fa-lg" style="color: #a13535;"></i>
+                                </span>
                             @endif
                         </td>
                         @if ($students_only)
@@ -215,7 +222,7 @@
                         @endif
                         <td class="numericTd"> {{$data_point->numGamesPlayed($students_only)}} </td>
                     @else
-                        <td> {{$data_point->created_at->format('M j, g:ia')}} </td>
+                        <td> {{$data_point->updated_at->format('M j, g:ia')}} </td>
 
                         @if (isset($my_games))
                             @if ($data_point->player1->rcid === $my_rcid)
@@ -242,7 +249,9 @@
     <div class="grid-2 mb-0">
         <div class="grid-item align-self-center py-15">
             @if (isset($ranks))
-                <p style="color:gray; font-size:14px" class="mb-0">Updated: {{$last_updated}} </p>
+                @if ($last_updated)
+                    <p style="color:gray; font-size:14px" class="mb-0">Updated: {{$last_updated}} </p>
+                @endif
             @elseif (isset($is_admin))
                 <a class = "btn btn-primary mb-2" name = "export" value="Export Excel"
                     href = '{{action([App\Http\Controllers\AdminController::class, 'exportStudentOnly'], ['term' => $current_term])}}'
@@ -258,6 +267,7 @@
         </div>
     </div>
     @if (isset($ranks))
+        <p style="color:rgb(161, 53, 53)" class="font-sm-15 font-17"><strong>Note:</strong> you need to have played at least 4 unique players to have a rank. </p>
         <p style="color:#197c8e" class="font-sm-12 font-17"><strong>Rating:</strong> predicts the outcome of future games betwen the players. If player A has rating 15 and player B has rating 23, player B is predicted to score 8 points more than player A. </p>
         <p style="color:#197c8e" class="pb-20 font-sm-12 font-17"><strong>Total Net Points:</strong> shows the difference between the number of points scored and the number of points lost by the player across all games. </p>
     @endif

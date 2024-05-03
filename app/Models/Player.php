@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\User;
 use App\Models\Game;
-use MathPHP\LinearAlgebra\Matrix;
 use MathPHP\LinearAlgebra\MatrixFactory;
+
 class Player extends Model
 {
     protected $table = "AcademicAffairsOperations.mcsp_pingpong.players";
@@ -45,7 +44,7 @@ class Player extends Model
         if ($students_only) {
             $all_games = $all_games->studentPlayers();
         }
-        return $all_games->orederBy('created_at', 'DESC')->get();
+        return $all_games->orderBy('updated_at', 'DESC')->get();
     }
 
     public function numGamesPlayed ($students_only) {
@@ -67,21 +66,22 @@ class Player extends Model
 
     public function numGamesStreak ($only_students) {
         $games = $this->gamesPlayed($only_students);
-        // games are sorted in descending order by the creation date
+        // games are sorted in descending order by updated_at
         $streak = 0;
         foreach ($games as $game) {
-            if ((int)$game->fkey_player1 === $this->id) {
-                if ($game->player1_score > $game->player2_score) {
-                    $streak += 1;
-                } else {
-                    $streal -= 1;
+            if (((int)$game->fkey_player1 === $this->id && $game->player1_score > $game->player2_score) ||
+                ((int)$game->fkey_player2 === $this->id && $game->player2_score > $game->player1_score)){
+                // $this player won
+                if ($streak < 0) {
+                    break;
                 }
+                $streak += 1;
             } else {
-                if ($game->player2_score > $game->player1_score) {
-                    $streak += 1;
-                } else {
-                    $streak -= 1;
+                // $this player lost
+                if ($streak > 0) {
+                    break;
                 }
+                $streak -= 1;
             }
         }
         return $streak;
@@ -127,12 +127,6 @@ class Player extends Model
 
     private static function getRREF($players, $only_students) {
         foreach ($players as $player) {
-            // $total_num_games = Game::where('fkey_player1', $player->id)
-            //                         ->orWhere('fkey_player2', $player->id);
-            // if ($only_students) {
-            //     $total_num_games = $total_num_games->studentPlayers();
-            // }
-            // $total_num_games = $total_num_games->count();
             $total_num_games = $player->numGamesPlayed($only_students);
 
             $player_net_points = ($only_students ? $player->total_net_students : $player->total_net_all);
@@ -153,12 +147,8 @@ class Player extends Model
                 }
             }
             $one_player_array[] = $player_net_points;
-            // dump($player->id);
-            // dump($player->user->rc_full_name);
-            // dump($one_player_array);
             $matrix[] = $one_player_array;
         }
-        // dump($matrix);
         $math_matrix = MatrixFactory::create($matrix);
         return ($math_matrix->rref());
     }
@@ -222,25 +212,19 @@ class Player extends Model
 
     private static function calculateRanks ($players, $only_students) {
         $rref = self::getRREF($players, $only_students);
-        // dump($rref);
         $ratings = self::addMinValue($rref->getColumn($players->count()));
-        // dump($ratings);
         self::storeRatings($ratings, $players, $only_students);
         $ranks = self::convertToRanks($rref->getColumn($players->count()));
         self::storeRanks($ranks, $players, $only_students);
-        // if($only_students){
-        //     ddd($ranks);
-        // }
     }
 
     public static function updateRanks ($only_students, Player $player1, Player $player2, $current_term) {
-        // LOG::
         $player1->updateTotalNet(false, $current_term);
         $player2->updateTotalNet(false, $current_term);
 
         $all_players = Player::where('term', $current_term)->get()
                                 ->filter(function ($player) {
-                                    if ($player->numUniqueOpponents(false) <= 3) {
+                                    if ($player->numUniqueOpponents(false) < 4) {
                                         $player->rating_all = -1;
                                         $player->rank_all = -1;
                                         $player->update();
@@ -258,7 +242,7 @@ class Player extends Model
             $player2->updateTotalNet(true, $current_term);
             $student_players = Player::where('term', $current_term)->where('is_student', true)->get()
                                         ->filter(function ($player) {
-                                            if ($player->numUniqueOpponents(true) <= 3) {
+                                            if ($player->numUniqueOpponents(true) < 4) {
                                                 $player->rating_students = -1;
                                                 $player->rank_students = -1;
                                                 $player->update();

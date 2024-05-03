@@ -120,6 +120,10 @@ label, li, .pt-serif-pro {
     .font-sm-12 {
         font-size: 12px;
     }
+
+    .font-sm-15 {
+        font-size: 15px;
+    }
 }
 
 .top-bar {

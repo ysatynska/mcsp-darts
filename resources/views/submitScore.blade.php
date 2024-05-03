@@ -14,6 +14,7 @@
 @section('stylesheets')
     <link href="{{URL::asset('assets/css/submitScore.css')}}" rel="stylesheet" />
     <link href="{{URL::asset('assets/css/weather.css')}}" rel="stylesheet" />
+    <link href="{{URL::asset('assets/css/open-weather-icons.css')}}" rel="stylesheet" />
 @endsection
 
 @section('javascript')
@@ -35,30 +36,36 @@
         }
         $(document).ready(function() {
             $('#header').append($('#weather-toggle'));
-            $('#weather-toggle').show();
+            $('#weather-toggle').removeClass('none');
             var tempScale = getCookie("temp-scale");
             if (tempScale == 'C') {
                 $('#c-toggle').addClass('active');
-                $('#degree-c').show();
+                $('#degree-c').removeClass('none');
             }
             else {
                 $('#f-toggle').addClass('active');
-                $('#degree-f').show();
+                $('#degree-f').removeClass('none');
             }
         });
         $(document).on("click", "#f-toggle", function () {
             $(this).addClass('active');
             $('#c-toggle').removeClass('active');
-            $('#degree-c').hide();
-            $('#degree-f').show();
+            $('#degree-c').addClass('none');
+            $('#degree-f').removeClass('none');
             document.cookie = "temp-scale=F";
         });
         $(document).on("click", "#c-toggle", function () {
             $(this).addClass('active');
             $('#f-toggle').removeClass('active');
-            $('#degree-f').hide();
-            $('#degree-c').show();
+            $('#degree-f').addClass('none');
+            $('#degree-c').removeClass('none');
             document.cookie = "temp-scale=C";
+        });
+        $(document).on("click", "input[name='tourn_game'][value='1']", function () {
+            $("input[name='term']").prop('disabled', true);
+        });
+        $(document).on("click", "input[name='tourn_game'][value='0']", function () {
+            $("input[name='term']").prop('disabled', false);
         });
     </script>
 @endsection
@@ -120,19 +127,30 @@
     </div>
 
     <div class="row text-center pt-0 pb-5 submit-button">
+        @if ($tournMode)
+            <div class='mb-15'>
+                <label class='mb-10'> Is this a tournament game? </label>
+                <br>
+                <label> <input type="radio" name="tourn_game" value="1" {{(old('tourn_game') == '1') ? 'checked' : ''}} required>
+                Yes </label>
+                <label> <input type="radio" name="tourn_game" value="0" {{(old('tourn_game') == '0') ? 'checked' : ''}} required>
+                No </label>
+                <br>
+            </div>
+        @endif
         @if ($is_admin)
             <label for="term">Admin Options - Term</label>
             <br>
-            <input list="existing_terms" id="term" name="term" placeholder="{{$current_term}}" class="text-center mb-15" autocomplete="off">
+            <input list="existing_terms" id="term" name="term" placeholder="{{$current_term}}" class="text-center mb-15" autocomplete="off" value="{{old('term')}}">
             <datalist id="existing_terms">
                 @foreach ($all_terms as $term)
                     <option value="{{$term}}">
                 @endforeach
             </datalist>
             <br>
-            <label style="color: rgb(167, 45, 45)">If you wish to {{$tournMode ? 'end' : 'start'}} a tournament, please use '{{$tournMode ? substr($current_term, 0, -1) : $current_term.'T'}}' as the format for the term.</label>
+            <label style="color: rgb(161, 53, 53)">If you wish to {{$tournMode ? 'end the' : 'start a'}} tournament, please use '{{$tournMode ? substr($current_term, 0, -1) : $current_term.'T'}}' as the format for the term.</label>
             <br>
-            <label style="color: rgb(167, 45, 45)" class='mb-15'>If you submit a game for any term other than '{{$current_term}}', all subsequent games will be recorded under that new term.</label>
+            <label style="color: rgb(161, 53, 53)" class='mb-15'>If you submit a game for any term other than '{{$current_term}}', all subsequent games will be recorded under that new term.</label>
             <br>
         @endif
         <input type='submit' class="btn btn-primary mb-15" value="Record Score">

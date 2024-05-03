@@ -13,8 +13,13 @@ hr {
 
 label, li, .pt-serif-pro {
     font-family: pt-serif-pro, serif;
+    font-size: large;
     color: rgb(77 80 85);
     font-weight: 700;
+}
+
+input {
+    margin-top: 5px;
 }
 
 li {

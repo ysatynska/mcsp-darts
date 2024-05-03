@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Player;
 use App\Models\Game;
 use App\Models\Weather;
-use Illuminate\Validation\Rules\Unique;
 
 class RanksController extends TemplateController
 {
@@ -20,11 +19,11 @@ class RanksController extends TemplateController
         $current_term = $request->term ? $request->term : Game::orderBy('created_at', 'desc')->first()->term;
         $ranks = true;
 
-        if (!is_null(Player::first())) {
-            $last_updated = Player::where('term', $current_term)->where('is_student', $students_only)->orderBy('updated_at','DESC')->first()->updated_at->diffForHumans();
-        } else {
-            $last_updated = null;
-        }
+        $lastUpdated = Player::where('term', $current_term)
+                            ->orderBy('updated_at', 'DESC')
+                            ->first();
+        $last_updated = $lastUpdated ? $lastUpdated->updated_at->diffForHumans() : null;
+
         if ($students_only){
             $student_ranks = Player::where('term', $current_term)
                                     ->where('is_student', true)
@@ -46,7 +45,7 @@ class RanksController extends TemplateController
         $all_terms = Game::orderBy('created_at', 'desc')
                     ->pluck('term')
                     ->unique()
-                    ->take(5);
+                    ->take(env('TERM_DISPLAY_NUMBER'));
 
         return view('adminOptions/games',
         ['data' => $student_ranks, 'ranks' => $ranks, 'search' => $search, 'students_only' => $students_only,

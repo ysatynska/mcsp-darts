@@ -9,6 +9,8 @@ use RCAuth;
 use App\Models\User;
 use App\Models\Player;
 use App\Models\Weather;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
 
@@ -24,6 +26,54 @@ class GamesController extends TemplateController
         return view('submitScore', ['user' => $user, 'weather' => $weather, 'is_admin' => in_array($rcid, config('app.admin_users', [])), 'all_terms' => $all_terms, 'current_term' => $current_term]);
     }
 
+    private function getCurrentTerm(Request $request) {
+        if ($request->term) {
+            // term is not null
+            if (!is_null($request->tourn_game)) {
+                if (!$request->tourn_game) {
+                    // tourn_game is no, term is not null
+                    if (substr($request->term, -1) === 'T') {
+                        $validator = Validator::make([], []);
+                        $validator->errors()->add('term', 'You cannot submit a non-tournament game for a tournament term.');
+                        throw new ValidationException($validator);
+                    } else {
+                        return [$request->term, null];
+                    }
+                } else {
+                    // tourn_game is yes, term is not null
+                    $validator = Validator::make([], []);
+                    $validator->errors()->add('tourn_game', 'You cannot submit a tournament game for a term other than the current one.');
+                    throw new ValidationException($validator);
+                }
+            } else {
+                // tourn_game is null, term is not null
+                return [$request->term, null];
+            }
+        } else {
+            // term is null
+            if (!is_null($request->tourn_game)) {
+                if ($request->tourn_game) {
+                    // tourn_game is yes, term is null
+                    return [Game::orderBy('created_at', 'desc')->first()->term, null];
+                } else {
+                    // tourn_game is no, term is null
+                    // need to find the latest term that is not a tournament term
+                    $skip = 1;
+                    while (true) {
+                        $current_term = Game::orderBy('created_at', 'desc')->skip($skip)->first();
+                        if (substr($current_term->term, -1) != 'T') {
+                            return [$current_term->term, $current_term->created_at];
+                        }
+                        $skip++;
+                    }
+                }
+            } else {
+                // tourn_game is null, term is null
+                return [Game::orderBy('created_at', 'desc')->first()->term, null];
+            }
+        }
+    }
+
     public function saveScore(Request $request) {
         $request->validate([
             'player1_id' => ['required', 'string', 'max:10'],
@@ -32,10 +82,12 @@ class GamesController extends TemplateController
             'player2_name' => ['required', 'string', 'max:50'],
             'score1' => ['required', 'min:0'],
             'score2' => ['required', 'min:0'],
+            'tourn_game' => ['nullable', 'boolean'],
             'term' => ['nullable', 'regex:/^\d{4}-\d{4}[T]?$/']
         ]);
 
-        $current_term = $request->term ? $request->term : Game::orderBy('created_at', 'desc')->first()->term;
+        [$current_term, $created_at] = $this->getCurrentTerm($request);
+
         $rcid = RCAuth::user()->rcid;
 
         $player1 = Player::processPlayer($request->player1_id, $rcid, $current_term);
@@ -50,11 +102,14 @@ class GamesController extends TemplateController
             'created_by' => $rcid,
             'updated_by' => $rcid
         ]);
+        if ($created_at) {
+            $game->created_at = $created_at;
+        }
         $game->save();
 
         $only_students = ($player1->is_student && $player2->is_student);
-        Player::updateRanks($only_students, $player1, $player2, $current_term);
-        // \App\Jobs\updateRanks::dispatch($only_students, $player1, $player2, $current_term);
+        // Player::updateRanks($only_students, $player1, $player2, $current_term);
+        \App\Jobs\updateRanks::dispatch($only_students, $player1, $player2, $current_term);
 
         $weather = Weather::orderByDesc('created_at')->first();
         return view('scoreRecorded', ['game' => $game, 'weather' => $weather]);
@@ -71,7 +126,7 @@ class GamesController extends TemplateController
                                     ->orWhereHas('player2', function ($query) use ($rcid) {
                                         $query->where('rcid', $rcid);
                                     });
-                            })->orderBy('created_at', 'DESC');
+                            })->orderBy('updated_at', 'DESC');
         if ($request->has('search')) {
             $all_games->search($search);
         }
@@ -83,7 +138,7 @@ class GamesController extends TemplateController
         $all_terms = Game::orderBy('created_at', 'desc')
                     ->pluck('term')
                     ->unique()
-                    ->take(5);
+                    ->take(env('TERM_DISPLAY_NUMBER'));
 
         return view('adminOptions/games',
         ['data' => $all_games, 'my_games' => $my_games, 'my_rcid' => $rcid, 'search' => $search,

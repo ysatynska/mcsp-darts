@@ -1,8 +1,8 @@
-<div id="weather-toggle" style="display: none">
+<div id="weather-toggle" class="none">
     <span class="temp" id="f-toggle">F</span>
     <span class="temp" id="c-toggle">C</span>
 
-    <div class="weather" id="degree-f">
+    <div class="weather none" id="degree-f">
         <a href="https://openweathermap.org/?lat=37.2942&lon=-80.0549" class="weather-icon" style="color: white; font-family: pt-serif-pro,serif">
         <i class="owi owi-{{$weather->icon}}" style="font-size: 2em; color: var(--yellow)"></i>
         <span style="font-size: 26px">{{$weather->temperature}}&deg;</span>F<br>
@@ -14,7 +14,7 @@
         </a>
     </div>
 
-    <div class="weather" id="degree-c">
+    <div class="weather none" id="degree-c">
         <a href="https://openweathermap.org/?lat=37.2942&lon=-80.0549" style="color: white; font-family: pt-serif-pro,serif">
         <i class="owi owi-{{$weather->icon}}" style="font-size: 2em; color: var(--yellow)"></i>
         @php($degreec = ($weather->temperature - 32) / 1.8)

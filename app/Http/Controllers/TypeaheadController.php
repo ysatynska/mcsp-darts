@@ -4,11 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use RCAuth;
-
 use App\Models\User;
-use App\Models\OldFormBuilder\OldFormBuilderForms;
-use App\Models\OldFormBuilder\OldFormBuilderPermissions;
 
 class TypeaheadController extends Controller
 {

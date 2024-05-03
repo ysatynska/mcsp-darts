@@ -18,7 +18,7 @@ class AdminController extends TemplateController
         $students_only = $request->boolean('students_only');
         $current_term = $request->term ? $request->term : Game::orderBy('created_at', 'desc')->first()->term;
 
-        $all_games = Game::where('term', $current_term)->orderBy('created_at', 'DESC');
+        $all_games = Game::where('term', $current_term)->orderBy('updated_at', 'DESC');
         if ($students_only) {
             $all_games = $all_games->studentPlayers();
         }
@@ -33,7 +33,7 @@ class AdminController extends TemplateController
         $all_terms = Game::orderBy('created_at', 'desc')
                     ->pluck('term')
                     ->unique()
-                    ->take(5);
+                    ->take(env('TERM_DISPLAY_NUMBER'));
 
         return view('adminOptions/games',
         ['data' => $all_games, 'is_admin' => $is_admin, 'students_only' => $students_only, 'search' => $search,

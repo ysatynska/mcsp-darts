@@ -15,7 +15,7 @@
             <td> {{$game->player2->user->rc_full_name}} </td>
             <td> {{$game->player1_score}} </td>
             <td> {{$game->player2_score}} </td>
-            <td> {{$game->created_at}} </td>
+            <td> {{$game->updated_at}} </td>
         </tr>
         @endforeach
     </tbody>
