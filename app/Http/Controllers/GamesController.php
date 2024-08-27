@@ -24,49 +24,44 @@ class GamesController extends TemplateController
     }
 
     private function getCurrentTerm(Request $request) {
-        if ($request->term) {
-            // term is not null
-            if (!is_null($request->tourn_game)) {
-                if (!$request->tourn_game) {
-                    // tourn_game is no, term is not null
-                    if (substr($request->term, -1) === 'T') {
-                        $validator = Validator::make([], []);
-                        $validator->errors()->add('term', 'You cannot submit a non-tournament game for a tournament term.');
-                        throw new ValidationException($validator);
-                    } else {
-                        return [$request->term, null];
+        if (!is_null($request->tourn_game)) {
+            // term is a tournament term
+            if ($request->tourn_game) {
+                // tourn_game is yes, term is null
+                return [Game::orderBy('created_at', 'desc')->first()->term, null];
+            } else {
+                // tourn_game is no, term is null
+                // need to find the latest term that is not a tournament term
+                $skip = 1;
+                while (true) {
+                    $current_term = Game::orderBy('created_at', 'desc')->skip($skip)->first();
+                    if (substr($current_term->term, -1) != 'T') {
+                        return [$current_term->term, $current_term->created_at];
                     }
-                } else {
-                    // tourn_game is yes, term is not null
+                    $skip++;
+                }
+            }
+        } else {
+            // tourn_game is null, term is null
+            // term is a non-tournament term
+            return [Game::orderBy('created_at', 'desc')->first()->term, null];
+        }
+    }
+
+    public function validateTerm (Request $request) {
+        if (!is_null($request->tourn_game)) {
+            if (!$request->tourn_game) {
+                // tourn_game is no, term is not null
+                if (substr($request->term, -1) === 'T') {
                     $validator = Validator::make([], []);
-                    $validator->errors()->add('tourn_game', 'You cannot submit a tournament game for a term other than the current one.');
+                    $validator->errors()->add('term', 'You cannot submit a non-tournament game for a tournament term.');
                     throw new ValidationException($validator);
                 }
             } else {
-                // tourn_game is null, term is not null
-                return [$request->term, null];
-            }
-        } else {
-            // term is null
-            if (!is_null($request->tourn_game)) {
-                if ($request->tourn_game) {
-                    // tourn_game is yes, term is null
-                    return [Game::orderBy('created_at', 'desc')->first()->term, null];
-                } else {
-                    // tourn_game is no, term is null
-                    // need to find the latest term that is not a tournament term
-                    $skip = 1;
-                    while (true) {
-                        $current_term = Game::orderBy('created_at', 'desc')->skip($skip)->first();
-                        if (substr($current_term->term, -1) != 'T') {
-                            return [$current_term->term, $current_term->created_at];
-                        }
-                        $skip++;
-                    }
-                }
-            } else {
-                // tourn_game is null, term is null
-                return [Game::orderBy('created_at', 'desc')->first()->term, null];
+                // tourn_game is yes, term is not null
+                $validator = Validator::make([], []);
+                $validator->errors()->add('tourn_game', 'You cannot submit a tournament game for a term other than the current one.');
+                throw new ValidationException($validator);
             }
         }
     }
@@ -82,8 +77,14 @@ class GamesController extends TemplateController
             'tourn_game' => ['nullable', 'boolean'],
             'term' => ['nullable', 'regex:/^\d{4}-\d{4}[T]?$/']
         ]);
+        $created_at = null;
 
-        [$current_term, $created_at] = $this->getCurrentTerm($request);
+        if(!empty($request->term)) {
+            $this->validateTerm($request);
+            $current_term = $request->term;
+        } else {
+            [$current_term, $created_at] = $this->getCurrentTerm($request);
+        }
 
         $rcid = RCAuth::user()->rcid;
 
@@ -99,7 +100,7 @@ class GamesController extends TemplateController
             'created_by' => $rcid,
             'updated_by' => $rcid
         ]);
-        if ($created_at) {
+        if (!is_null($created_at)) {
             $game->created_at = $created_at;
         }
         $game->save();

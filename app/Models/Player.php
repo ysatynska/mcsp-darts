@@ -52,16 +52,12 @@ class Player extends Model
     }
 
     public function numUniqueOpponents ($students_only) {
-        $opponents = array();
         $games = $this->gamesPlayed($students_only);
-        foreach ($games as $game) {
-            if ((int)$game->fkey_player1 === $this->id) {
-                $opponents[] = $game->fkey_player2;
-            } else {
-                $opponents[] = $game->fkey_player1;
-            }
-        }
-        return count(array_unique($opponents));
+        $this_id = $this->id;
+        $unique_opponents = $games->map(function ($game) use ($this_id) {
+            return ($game->fkey_player1 == $this_id ? $game->fkey_player2 : $game->fkey_player1);
+        })->unique()->count();
+        return $unique_opponents;
     }
 
     public function numGamesStreak ($only_students) {

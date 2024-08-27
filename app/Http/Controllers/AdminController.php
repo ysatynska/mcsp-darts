@@ -33,7 +33,7 @@ class AdminController extends TemplateController
         $all_terms = Game::orderBy('created_at', 'desc')
                     ->pluck('term')
                     ->unique()
-                    ->take(env('TERM_DISPLAY_NUMBER'));
+                    ->take(config('app.term_display_number'));
 
         return view('adminOptions/games',
         ['data' => $all_games, 'is_admin' => $is_admin, 'students_only' => $students_only, 'search' => $search,

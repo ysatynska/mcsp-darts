@@ -238,5 +238,6 @@ return [
 
     ],
     'admin_users' => explode(', ', env("ADMIN_USERS", '')),
-    'entries_per_page' => env("PAGE_NUMBER")
+    'entries_per_page' => env("PAGE_NUMBER"),
+    'term_display_number' => env("TERM_DISPLAY_NUMBER"),
 ];
