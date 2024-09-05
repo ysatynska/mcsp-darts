@@ -13,22 +13,26 @@ class Player extends Model
     protected $table = "AcademicAffairsOperations.mcsp_pingpong.players";
     protected $primaryKey = "id";
 
-    protected $fillable = ['rcid', 'net_points', 'is_student', 'rank', 'term', 'created_by', 'updated_by'];
+    protected $fillable = ['rcid', 'is_student', 'fkey_term_id', 'created_by', 'updated_by'];
     protected $dates = ['deleted_at'];
-    protected $with = ['user'];
+    protected $with = ['user', 'term'];
 
     public function user () {
         return $this->hasOne(User::class, 'RCID', 'rcid');
     }
 
-    public static function processPlayer($player_rcid, $submitter_rcid, $current_term) {
-        $player = Player::where('rcid', $player_rcid)->where('term', $current_term)->first();
+    public function term () {
+        return $this->hasOne(Term::class, 'id', 'fkey_term_id');
+    }
+
+    public static function processPlayer($player_rcid, $submitter_rcid, $submitted_to_term_id) {
+        $player = Player::where('rcid', $player_rcid)->where('fkey_term_id', $submitted_to_term_id)->first();
         if (empty($player->id)) {
             $user = User::find($player_rcid);
             $player = new Player ([
                 'rcid' => $player_rcid,
                 'is_student' => ($user->Student === 'Yes'),
-                'term' => $current_term,
+                'fkey_term_id' => $submitted_to_term_id,
                 'created_by' => $submitter_rcid,
                 'updated_by' => $submitter_rcid
             ]);
@@ -44,7 +48,7 @@ class Player extends Model
         if ($students_only) {
             $all_games = $all_games->studentPlayers();
         }
-        return $all_games->orderBy('updated_at', 'DESC')->get();
+        return $all_games->orderBy('created_at', 'DESC')->get();
     }
 
     public function numGamesPlayed ($students_only) {
@@ -56,13 +60,13 @@ class Player extends Model
         $this_id = $this->id;
         $unique_opponents = $games->map(function ($game) use ($this_id) {
             return ($game->fkey_player1 == $this_id ? $game->fkey_player2 : $game->fkey_player1);
-        })->unique()->count();
-        return $unique_opponents;
+        })->unique();
+        return $unique_opponents->count();
     }
 
     public function numGamesStreak ($only_students) {
         $games = $this->gamesPlayed($only_students);
-        // games are sorted in descending order by updated_at
+        // games are sorted in descending order
         $streak = 0;
         foreach ($games as $game) {
             if (((int)$game->fkey_player1 === $this->id && $game->player1_score > $game->player2_score) ||
@@ -81,29 +85,6 @@ class Player extends Model
             }
         }
         return $streak;
-    }
-
-    public function updateTotalNet ($only_students, $current_term) {
-        $gamesPlayed = $this->gamesPlayed($only_students);
-        $pointsFor = 0;
-        $pointsAgainst = 0;
-
-        foreach ($gamesPlayed as $game) {
-            if ((int)$game->fkey_player1 === $this->id) {
-                $pointsFor += $game->player1_score;
-                $pointsAgainst += $game->player2_score;
-            } else {
-                $pointsFor += $game->player2_score;
-                $pointsAgainst += $game->player1_score;
-            }
-        }
-
-        if ($only_students) {
-            $this->total_net_students = $pointsFor - $pointsAgainst;
-        } else {
-            $this->total_net_all = $pointsFor - $pointsAgainst;
-        }
-        $this->update();
     }
 
     public function scopeSearch(Builder $query, $search_term) {
@@ -147,6 +128,30 @@ class Player extends Model
         }
         $math_matrix = MatrixFactory::create($matrix);
         return ($math_matrix->rref());
+    }
+
+    public function updateTotalNet ($only_students, $rcid_auth) {
+        $gamesPlayed = $this->gamesPlayed($only_students);
+        $pointsFor = 0;
+        $pointsAgainst = 0;
+
+        foreach ($gamesPlayed as $game) {
+            if ((int)$game->fkey_player1 === $this->id) {
+                $pointsFor += $game->player1_score;
+                $pointsAgainst += $game->player2_score;
+            } else {
+                $pointsFor += $game->player2_score;
+                $pointsAgainst += $game->player1_score;
+            }
+        }
+
+        if ($only_students) {
+            $this->total_net_students = $pointsFor - $pointsAgainst;
+        } else {
+            $this->total_net_all = $pointsFor - $pointsAgainst;
+        }
+        $this->updated_by = $rcid_auth;
+        $this->update();
     }
 
     private static function storeRanks ($ranks, $players, $only_students) {
@@ -214,19 +219,12 @@ class Player extends Model
         self::storeRanks($ranks, $players, $only_students);
     }
 
-    public static function updateRanks ($only_students, Player $player1, Player $player2, $current_term) {
-        $player1->updateTotalNet(false, $current_term);
-        $player2->updateTotalNet(false, $current_term);
-
-        $all_players = Player::where('term', $current_term)->get()
+    public static function updateRanks ($only_students, Player $player1, Player $player2, $submitted_to_term_id, $rcid_auth) {
+        $player1->updateTotalNet(false, $rcid_auth);
+        $player2->updateTotalNet(false, $rcid_auth);
+        $all_players = Player::where('fkey_term_id', $submitted_to_term_id)->get()
                                 ->filter(function ($player) {
-                                    if ($player->numUniqueOpponents(false) < 4) {
-                                        $player->rating_all = -1;
-                                        $player->rank_all = -1;
-                                        $player->update();
-                                        return false;
-                                    }
-                                    return true;
+                                    return $player->numUniqueOpponents(false) >= 4;
                                 });
         // not considering players that played less than 4 unique people to make sure the matrix is closed.
         if ($all_players->count() > 0) {
@@ -234,17 +232,11 @@ class Player extends Model
         }
 
         if ($only_students){
-            $player1->updateTotalNet(true, $current_term);
-            $player2->updateTotalNet(true, $current_term);
-            $student_players = Player::where('term', $current_term)->where('is_student', true)->get()
+            $player1->updateTotalNet(true, $rcid_auth);
+            $player2->updateTotalNet(true, $rcid_auth);
+            $student_players = Player::where('fkey_term_id', $submitted_to_term_id)->where('is_student', true)->get()
                                         ->filter(function ($player) {
-                                            if ($player->numUniqueOpponents(true) < 4) {
-                                                $player->rating_students = -1;
-                                                $player->rank_students = -1;
-                                                $player->update();
-                                                return false;
-                                            }
-                                            return true;
+                                            return $player->numUniqueOpponents(true) >= 4;
                                         });
             if ($student_players->count() > 0) {
                 self::calculateRanks($student_players, true);

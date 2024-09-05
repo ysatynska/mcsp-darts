@@ -20,14 +20,6 @@
 @section('javascript')
     <script defer src="{{URL::asset('assets/js/submitScore.js')}}"> </script>
     <script src="{{URL::asset('assets/js/weather-toggle.js')}}"></script>
-    <script>
-        $(document).on("click", "input[name='tourn_game'][value='1']", function () {
-            $("input[name='term']").prop('disabled', true);
-        });
-        $(document).on("click", "input[name='tourn_game'][value='0']", function () {
-            $("input[name='term']").prop('disabled', false);
-        });
-    </script>
 @endsection
 
 @section('content')
@@ -41,7 +33,6 @@
             </div>
         </div>
     @endif
-    @php $tournMode = substr($current_term, -1) === 'T' @endphp
 
     <div class="text-center">
         <h3 class="py-15"> Minton Invitational </h3>
@@ -49,11 +40,12 @@
 
     <form method="POST" action="{{ action([App\Http\Controllers\GamesController::class, 'saveScore']) }}">
         @csrf
+        <input type="hidden" name="term_id" value="{{$current_term->id}}">
         <div class="grid-2 py-lg-20 pb-sm-10">
             <div class="grid-item text-center">
                 <label>Player 1
                     {!! MustangBuilder::typeaheadAjax("player1_name",
-                        action([App\Http\Controllers\TypeaheadController::class, 'user_search']), $user->display_name,
+                        action([App\Http\Controllers\TypeaheadController::class, 'user_search']), $user->rc_full_name,
                         array("input_data_name" => "input_data", "display_data_name"=>"display_data"),
                         array("class"=>"typehead text-center", "required" => true),
                         "new_person",
@@ -87,9 +79,9 @@
         </div>
 
         <div class="row text-center pt-0 pb-5 submit-button">
-            @if ($tournMode)
+            @if ($current_term->tourn_term)
                 <div class='mb-15'>
-                    <label class='mb-10'> Is this a tournament game? </label>
+                    <label class='mb-10'> Is this game for a tournament? </label>
                     <br>
                     <label> <input type="radio" name="tourn_game" value="1" {{(old('tourn_game') == '1') ? 'checked' : ''}} required>
                     Yes </label>
@@ -98,21 +90,7 @@
                     <br>
                 </div>
             @endif
-            @if ($is_admin)
-                <label for="term">Admin Options - Term</label>
-                <br>
-                <input list="existing_terms" id="term" name="term" placeholder="{{$current_term}}" class="text-center mb-15" autocomplete="off" value="{{old('term')}}">
-                <datalist id="existing_terms">
-                    @foreach ($all_terms as $term)
-                        <option value="{{$term}}">
-                    @endforeach
-                </datalist>
-                <br>
-                <label style="color: rgb(161, 53, 53)">If you wish to {{$tournMode ? 'end the' : 'start a'}} tournament, please use '{{$tournMode ? substr($current_term, 0, -1) : $current_term.'T'}}' as the format for the term.</label>
-                <br>
-                <label style="color: rgb(161, 53, 53)" class='mb-15'>If you submit a game for any term other than '{{$current_term}}', all subsequent games will be recorded under that new term.</label>
-                <br>
-            @endif
+
             <input type='submit' class="btn btn-primary mb-15" value="Record Score">
             <br>
             <a class = "btn btn-warning" name = "join_chat" value="Join Discord Server"

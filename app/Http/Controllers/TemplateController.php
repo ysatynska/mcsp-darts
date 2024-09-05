@@ -25,6 +25,7 @@ class TemplateController extends Controller
 
             if (in_array($rcid, config('app.admin_users', []))) {
                 $side_navigation['<span class="far fa-list"></span> All Games'] = action([AdminController::class, 'allGames'], ['students_only' => 'yes']);
+                $side_navigation['<span class="fa-sharp fa-regular fa-money-check-pen"></span> Manage Terms'] = action([AdminController::class, 'manageTerms']);
             }
             $side_navigation['<span class="far fa-sign-out"></span> Logout '.RCAuth::user()->username] = route('logout');
         } else {

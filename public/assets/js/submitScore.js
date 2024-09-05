@@ -14,7 +14,6 @@ function generateError (errorMessage) {
     errorObject.textContent = errorMessage;
     spotForError.appendChild(linebreak);
     spotForError.appendChild(errorObject);
-
     window.addEventListener('click', removeErrorMessage, { once: true });
 }
 

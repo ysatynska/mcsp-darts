@@ -5,15 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Player;
+use App\Models\Term;
 
 class Game extends Model
 {
     protected $table = "AcademicAffairsOperations.mcsp_pingpong.games";
     protected $primaryKey = "id";
 
-    protected $fillable = ['fkey_player1', 'fkey_player2', 'player1_score', 'player2_score', 'term', 'created_by', 'updated_by'];
+    protected $fillable = ['fkey_player1', 'fkey_player2', 'player1_score', 'player2_score', 'fkey_term_id', 'created_by', 'updated_by'];
     protected $dates = ['deleted_at'];
-    protected $with = ['player1', 'player2'];
+    protected $with = ['player1', 'player2', 'term'];
 
     public function scopeSearch(Builder $query, $search_term) {
         if (!empty($search_term)) {
@@ -41,6 +42,10 @@ class Game extends Model
 
       public function player2 () {
         return $this->hasOne(Player::class, 'id', 'fkey_player2');
+      }
+
+      public function term () {
+        return $this->hasOne(Term::class, 'id', 'fkey_term_id');
       }
 
       public function scopeStudentPlayers (Builder $query) {

@@ -37,11 +37,11 @@
         </div>
         <div class="text-center pb-15">
             <a class="btn btn-primary"
-                href = '{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'yes']) }}'
+                href = '{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'yes', 'term_id' => $submitted_to_term_id]) }}'
                 name="home" value="home"> View Ranks
             </a>
             <a class="btn btn-primary"
-                href = '{{ action([App\Http\Controllers\GamesController::class, 'myGames']) }}'
+                href = '{{ action([App\Http\Controllers\GamesController::class, 'myGames'], ['term_id' => $submitted_to_term_id]) }}'
                 name="home" value="home"> View My Games
             </a>
         </div>

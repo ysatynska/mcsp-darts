@@ -61,16 +61,16 @@
             @foreach ($all_terms as $term)
                 <li>
                     @if (isset($my_games))
-                        <a href="{{ action([App\Http\Controllers\GamesController::class, 'myGames'], ['term' => $term]) }}" style="background-color: {{$term == $current_term ? 'rgb(245, 245, 245)' : ''}}">
-                            {{$term}}
+                        <a href="{{ action([App\Http\Controllers\GamesController::class, 'myGames'], ['term_id' => $term->id]) }}" style="background-color: {{$term->id == $current_term->id ? 'rgb(245, 245, 245)' : ''}}">
+                            {{$term->term_name}}@if($term->tourn_term)T @endif
                         </a>
                     @elseif (isset($ranks))
-                        <a href="{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => $students_only, 'term' => $term]) }}" style="background-color: {{$term == $current_term ? 'rgb(245, 245, 245)' : ''}}">
-                            {{$term}}
+                        <a href="{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => $students_only, 'term_id' => $term->id]) }}" style="background-color: {{$term->id == $current_term->id ? 'rgb(245, 245, 245)' : ''}}">
+                            {{$term->term_name}}@if($term->tourn_term)T @endif
                         </a>
                     @else
-                        <a href="{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => $students_only, 'term' => $term]) }}" style="background-color: {{$term == $current_term ? 'rgb(245, 245, 245)' : ''}}">
-                            {{$term}}
+                        <a href="{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => $students_only, 'term_id' => $term->id]) }}" style="background-color: {{$term->id == $current_term->id ? 'rgb(245, 245, 245)' : ''}}">
+                            {{$term->term_name}}@if($term->tourn_term)T @endif
                         </a>
                     @endif
                 </li>
@@ -84,28 +84,28 @@
                     @if (isset($my_games))
                         My Games
                     @elseif (isset($ranks))
-                        <a href='{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'yes', 'search' => $search, 'term' => $current_term]) }}'
+                        <a href='{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'yes', 'search' => $search, 'term_id' => $current_term->id]) }}'
                             @if (!$students_only)
                                 style="color:gray; font-size:16px"
                             @endif>
                             Students' Ranks
                         </a>
                         <br>
-                        <a href='{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'no', 'search' => $search, 'term' => $current_term]) }}'
+                        <a href='{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'no', 'search' => $search, 'term_id' => $current_term->id]) }}'
                             @if ($students_only)
                                 style="color:gray; font-size:16px"
                             @endif>
                             All Players' Ranks
                         </a>
                     @else
-                        <a href='{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'yes', 'search' => $search, 'term' => $current_term]) }}'
+                        <a href='{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'yes', 'search' => $search, 'term_id' => $current_term->id]) }}'
                             @if (!$students_only)
                                 style="color:gray; font-size:16px"
                             @endif>
                             Student Games
                         </a>
                         <br>
-                        <a href='{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'no', 'search' => $search, 'term' => $current_term]) }}'
+                        <a href='{{ action([App\Http\Controllers\AdminController::class, 'allGames'], ['students_only' => 'no', 'search' => $search, 'term_id' => $current_term->id]) }}'
                             @if ($students_only)
                                 style="color:gray; font-size:16px"
                             @endif>
@@ -122,13 +122,13 @@
                             <button id="search_btn" type="submit" class="btn btn-info">&nbsp<span class="far fa-search"></span>&nbsp</button>
                         </span>
                     </div>
-                    <input type="hidden" name="term" value="{{$current_term}}" />
+                    <input type="hidden" name="term_id" value="{{$current_term->id}}" />
                     @isset($students_only)
                         <input type="hidden" name="students_only" value="{{$students_only ? "yes" : "no"}}" />
                     @endisset
                 </form>
             </div>
-            </div>
+        </div>
         <table>
             <thead>
                 <tr>
@@ -213,11 +213,11 @@
                     @endif
                 @elseif (isset($is_admin))
                     <a class = "btn btn-primary mb-2" name = "export" value="Export Excel"
-                        href = '{{action([App\Http\Controllers\AdminController::class, 'exportStudentOnly'], ['term' => $current_term])}}'
+                        href = '{{action([App\Http\Controllers\AdminController::class, 'exportStudentOnly'], ['term_id' => $current_term->id])}}'
                     >Export Students Only</a>
 
                     <a class = "btn btn-primary mb-2" name = "export" value="Export Excel"
-                        href = '{{action([App\Http\Controllers\AdminController::class, 'exportAll'], ['term' => $current_term])}}'
+                        href = '{{action([App\Http\Controllers\AdminController::class, 'exportAll'], ['term_id' => $current_term->id])}}'
                     >Export All</a>
                 @endif
             </div>
