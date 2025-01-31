@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Game;
+use App\Models\Round;
 use RCAuth;
 use App\Models\User;
 use App\Models\Player;
@@ -26,10 +27,8 @@ class GamesController extends TemplateController
         $request->validate([
             'player1_id' => ['required', 'string', 'max:10'],
             'player2_id' => ['required', 'string', 'max:10'],
-            'player1_name' => ['required', 'string', 'max:50'],
-            'player2_name' => ['required', 'string', 'max:50'],
-            'score1' => ['required', 'min:0'],
-            'score2' => ['required', 'min:0'],
+            'player1_scores.*' => ['required', 'integer', 'min:0'],
+            'player2_scores.*' => ['required', 'integer', 'min:0'],
             'tourn_game' => ['nullable', 'boolean'],
             'term_id' => ['nullable', 'integer']
         ]);
@@ -49,9 +48,10 @@ class GamesController extends TemplateController
         $player1 = Player::processPlayer($request->player1_id, $rcid, $submitted_to_term_id);
         $player2 = Player::processPlayer($request->player2_id, $rcid, $submitted_to_term_id);
 
+
         $game = new Game ([
-            'player1_score' => $request->score1,
-            'player2_score' => $request->score2,
+            'player1_score' => array_sum($request->player1_scores),
+            'player2_score' => array_sum($request->player2_scores),
             'fkey_player1' => $player1->id,
             'fkey_player2' => $player2->id,
             'fkey_term_id' => $submitted_to_term_id,
@@ -60,9 +60,23 @@ class GamesController extends TemplateController
         ]);
         $game->save();
 
-        $only_students = ($player1->is_student && $player2->is_student);
-        \App\Jobs\updateRanks::dispatch($only_students, $player1, $player2, $submitted_to_term_id, $rcid);
-        
+        for ($i = 0; $i < count($request->player1_scores)/3; $i++) {
+            for ($j = 0; $j < 3; $j++) {
+                $round = new Round ([
+                    'round_number' => $i+1,
+                    'score1' => $request->player1_scores[$i*3 + $j],
+                    'score2' => $request->player2_scores[$i*3 + $j],
+                    'game_id' => $game->id,
+                    'created_by' => $rcid,
+                    'updated_by' => $rcid
+                ]);
+                $round->save();
+            }
+        }
+
+        // $only_students = ($player1->is_student && $player2->is_student);
+        // \App\Jobs\updateRanks::dispatch($only_students, $player1, $player2, $submitted_to_term_id, $rcid);
+
         $weather = Weather::orderByDesc('created_at')->first();
         return view('scoreRecorded', ['game' => $game, 'weather' => $weather, 'submitted_to_term_id' => Term::find($submitted_to_term_id)]);
     }
@@ -92,5 +106,12 @@ class GamesController extends TemplateController
         return view('adminOptions/games',
         ['data' => $all_games, 'my_games' => true, 'my_rcid' => $rcid, 'search' => $search,
             'search_action' => $search_action, 'weather' => $weather, 'all_terms' => $all_terms, 'current_term' => $current_term]);
+    }
+
+    public function gameDetails (Request $request) {
+        $game = Game::find($request->game_id);
+        $rounds = Round::where('game_id', $game->id)->paginate(env("PAGE_NUMBER"))->withQueryString();
+        $weather = Weather::orderByDesc('created_at')->first();
+        return view('gameDetails', ['game' => $game, 'rounds' => $rounds, 'weather' => $weather]);
     }
 }

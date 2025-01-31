@@ -34,6 +34,7 @@ Route::middleware('force_login')->group(function () {
     Route::get('my_games', [GamesController::class, 'myGames']);
     Route::get('ranks', [RanksController::class, 'showRanks']);
     Route::get('update_ranks', [RanksController::class, 'updateRanks']);
+    Route::get('game_details', [GamesController::class, 'gameDetails']);
 
     Route::prefix('adminoptions')->group(function(){
         Route::middleware('force_admin')->group(function () {

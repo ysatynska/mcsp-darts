@@ -43,6 +43,7 @@ return [
             'password' => env('DB_PASSWORD', ''),
             'charset' => 'utf8',
             'prefix' => '',
+            'trust_server_certificate' => true,
         ],
         'DailyEmail' => [
             'driver' => 'sqlsrv',

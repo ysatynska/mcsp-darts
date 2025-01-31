@@ -36,7 +36,7 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'table' => 'AcademicAffairsOperations.mcsp_pingpong.jobs',
+            'table' => 'AcademicAffairsOperations.mcsp_darts.jobs',
             'queue' => 'default',
             'retry_after' => 90,
             'after_commit' => false,

@@ -88,7 +88,7 @@
                             @if (!$students_only)
                                 style="color:gray; font-size:16px"
                             @endif>
-                            Students' Ranks
+                            Students' Ranks - <span style="color: rgb(209, 74, 1)">Coming Soon</span>
                         </a>
                         <br>
                         <a href='{{ action([App\Http\Controllers\RanksController::class, 'showRanks'], ['students_only' => 'no', 'search' => $search, 'term_id' => $current_term->id]) }}'
@@ -155,8 +155,8 @@
             </thead>
             <tbody>
                 @foreach ($data as $data_point)
-                    <tr>
-                        @if (isset($ranks))
+                    @if (isset($ranks))
+                        <tr>
                             @if ($students_only)
                                 <td> {{$data_point->rank_students}} </td>
                             @else
@@ -180,7 +180,12 @@
                                 <td class="numericTd"> {{$data_point->total_net_all}} </td>
                             @endif
                             <td class="numericTd"> {{$data_point->numGamesPlayed($students_only)}} </td>
-                        @else
+                        </tr>
+                    @else
+                        <tr
+                            class='clickable-row'
+                            data-href='{{ action([App\Http\Controllers\GamesController::class, 'gameDetails'], ['game_id' => $data_point->id]) }}'
+                        >
                             <td> {{$data_point->updated_at->format('M j, g:ia')}} </td>
 
                             @if (isset($my_games))
@@ -199,8 +204,8 @@
                                 <td class="numericTd"> {{$data_point->player1_score}} </td>
                                 <td class="numericTd"> {{$data_point->player2_score}} </td>
                             @endif
-                        @endif
-                    </tr>
+                        </tr>
+                    @endif
                 @endforeach
             </tbody>
         </table>

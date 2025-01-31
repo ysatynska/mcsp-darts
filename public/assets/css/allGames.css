@@ -102,6 +102,10 @@ label, li, .pt-serif-pro {
     font-size: 17px;
 }
 
+.clickable-row {
+    cursor: pointer;
+}
+
 .bold {
     font-weight: bold;
 }

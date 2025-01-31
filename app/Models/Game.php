@@ -9,7 +9,7 @@ use App\Models\Term;
 
 class Game extends Model
 {
-    protected $table = "AcademicAffairsOperations.mcsp_pingpong.games";
+    protected $table = "AcademicAffairsOperations.mcsp_darts.games";
     protected $primaryKey = "id";
 
     protected $fillable = ['fkey_player1', 'fkey_player2', 'player1_score', 'player2_score', 'fkey_term_id', 'created_by', 'updated_by'];
@@ -34,26 +34,30 @@ class Game extends Model
                 });
             }
         }
-      }
+    }
 
-      public function player1 () {
+    public function player1 () {
         return $this->hasOne(Player::class, 'id', 'fkey_player1');
-      }
+    }
 
-      public function player2 () {
+    public function player2 () {
         return $this->hasOne(Player::class, 'id', 'fkey_player2');
-      }
+    }
 
-      public function term () {
+    public function term () {
         return $this->hasOne(Term::class, 'id', 'fkey_term_id');
-      }
+    }
 
-      public function scopeStudentPlayers (Builder $query) {
+    public function scopeStudentPlayers (Builder $query) {
         $query->whereHas('player1', function ($query) {
             $query->where('is_student', true);
         })
         ->whereHas('player2', function ($query) {
             $query->where('is_student', true);
         });
-      }
+    }
+
+    public function rounds () {
+        return $this->hasMany(Round::class, 'game_id', 'id');
+    }
 }

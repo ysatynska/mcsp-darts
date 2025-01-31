@@ -4,11 +4,11 @@
 @endsection
 
 @section('page_title')
-    Ping Pong
+    MCSP Darts
 @endsection
 
 @section('heading')
-  Submit Score
+    Submit Score
 @endsection
 
 @section('stylesheets')
@@ -19,7 +19,7 @@
 
 @section('javascript')
     <script defer src="{{URL::asset('assets/js/submitScore.js')}}"> </script>
-    <script src="{{URL::asset('assets/js/weather-toggle.js')}}"></script>
+    <script src="{{URL::asset('assets/js/weather-toggle.js')}}" defer></script>
 @endsection
 
 @section('content')
@@ -35,7 +35,7 @@
     @endif
 
     <div class="text-center">
-        <h3 class="py-15"> Minton Invitational </h3>
+        <h3 class="py-15"> Second Minton Invitational </h3>
     </div>
 
     <form method="POST" action="{{ action([App\Http\Controllers\GamesController::class, 'saveScore']) }}">
@@ -45,13 +45,21 @@
             <div class="grid-item text-center">
                 <label>Player 1
                     {!! MustangBuilder::typeaheadAjax("player1_name",
-                        action([App\Http\Controllers\TypeaheadController::class, 'user_search']), $user->rc_full_name,
+                        action([App\Http\Controllers\TypeaheadController::class, 'user_search']), $user->display_name,
                         array("input_data_name" => "input_data", "display_data_name"=>"display_data"),
                         array("class"=>"typehead text-center", "required" => true),
                         "new_person",
                         true)
                     !!}
                     <input type="hidden" name="player1_id" id="new_person1" value="{{$user->RCID}}">
+                </label>
+            </div>
+            <div class="player_scores_div grid-item text-center">
+                <label>Total - <span id="total-score1">0 <span style="color: rgb(220, 58, 17);">(271 to go) </span></span>
+                    <br>
+                    <input type="number" name="player1_scores[0]" style="width: 7rem; display: inline-block;" class="text-center form-control" min="0">
+                    <input type="number" name="player1_scores[1]" style="width: 7rem; display: inline-block;" class="text-center form-control" min="0">
+                    <input type="number" name="player1_scores[2]" style="width: 7rem; display: inline-block;" class="text-center form-control" min="0">
                 </label>
             </div>
             <div class="grid-item text-center">
@@ -66,19 +74,17 @@
                     <input type="hidden" name="player2_id" id="new_person2" value="{{old('player2_id')}}">
                 </label>
             </div>
-            <div class="grid-item text-center">
-                <label>Score 1 <br>
-                    <input class="form-control text-center" type="number" name="score1" min="0" value="{{old('score1')}}" required>
-                </label>
-            </div>
-            <div class="grid-item text-center">
-                <label>Score 2 <br>
-                    <input class="form-control text-center" type="number" name="score2" min="0" value="{{old('score2')}}" required>
+            <div class="player_scores_div grid-item text-center">
+                <label>Total - <span id="total-score2">0 <span style="color: rgb(220, 58, 17);">(271 to go) </span></span>
+                    <br>
+                    <input type="number" name="player2_scores[0]" style="width: 7rem; display: inline-block;" class="text-center form-control" min="0">
+                    <input type="number" name="player2_scores[1]" style="width: 7rem; display: inline-block;" class="text-center form-control" min="0">
+                    <input type="number" name="player2_scores[2]" style="width: 7rem; display: inline-block;" class="text-center form-control" min="0">
                 </label>
             </div>
         </div>
 
-        <div class="row text-center pt-0 pb-5 submit-button">
+        <div class="row text-center pt-0 pb-5" id="spot-for-error">
             @if ($current_term->tourn_term)
                 <div class='mb-15'>
                     <label class='mb-10'> Is this game for a tournament? </label>
@@ -90,26 +96,30 @@
                     <br>
                 </div>
             @endif
-
-            <input type='submit' class="btn btn-primary mb-15" value="Record Score">
-            <br>
+            <div>
+                <button type="button" class="btn btn-primary mb-20" id="update_totals">Update Totals</button>
+            </div>
             <a class = "btn btn-warning" name = "join_chat" value="Join Discord Server"
                 href = "https://discord.gg/UCYV3AVYZr"
             >Join Discord Server</a>
         </div>
     </form>
     <hr>
+    <br>
     <div class="grid-2 pt-lg-20 gap-8">
-            <div class = "grid-item justify-self-center">
+            <div class = "grid-item justify-self-center mb-25">
                 <h3 class="text-center">Rules</h3>
                 <ol>
-                <li>Game to 21, win by 2.</li>
-                <li>Each player gets 5 serves.</li>
-                <li>You can play whomever you want, whenever you want.  </li>
+                <li>Games to 271, win by 1.</li>
+                <li>Players alternate each throw.  </li>
+                <li>Each player gets 3 shots per round.</li>
                 </ol>
             </div>
-        <div class="grid-item text-center">
-            <img src="{{URL::asset('MI.png')}}" alt="Roland Minton" class="width-lg-65 width-sm-90">
+        <div class="grid-item text-center img-sm">
+            <img src="{{URL::asset('MIDartsSm.png')}}" alt="Roland Minton" class="width-90">
+        </div>
+        <div class="grid-item text-center img-lg">
+            <img src="{{URL::asset('MIDartsLg.png')}}" alt="Roland Minton" class="width-65">
         </div>
     </div>
 @endsection

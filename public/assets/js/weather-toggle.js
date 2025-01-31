@@ -39,3 +39,8 @@ $(document).on("click", "#c-toggle", function () {
     $('#degree-c').show();
     document.cookie = "temp-scale=C";
 });
+$(document).ready(function() {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});

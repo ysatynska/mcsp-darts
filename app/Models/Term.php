@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Term extends Model
 {
-    protected $table = "AcademicAffairsOperations.mcsp_pingpong.terms";
+    protected $table = "AcademicAffairsOperations.mcsp_darts.terms";
     protected $primaryKey = "id";
 
     protected $fillable = ['term_name', 'tourn_term', 'current_term', 'created_by', 'updated_by'];

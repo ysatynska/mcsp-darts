@@ -10,7 +10,7 @@ use MathPHP\LinearAlgebra\MatrixFactory;
 
 class Player extends Model
 {
-    protected $table = "AcademicAffairsOperations.mcsp_pingpong.players";
+    protected $table = "AcademicAffairsOperations.mcsp_darts.players";
     protected $primaryKey = "id";
 
     protected $fillable = ['rcid', 'is_student', 'fkey_term_id', 'created_by', 'updated_by'];

@@ -99,13 +99,13 @@ class AdminController extends TemplateController
         $term_exported = Term::find($request->term_id);
         $term_string = $term_exported->term_name.($term_exported->tourn_term ? 'tourn':'');
         $all_games = Game::where('fkey_term_id', $request->term_id)->orderBy('created_at','DESC')->get();
-        return \Excel::download(new GamesExport($all_games, $term_string), 'pingpong_all_'.$term_string.'.xlsx');
+        return \Excel::download(new GamesExport($all_games, $term_string), 'darts_all_'.$term_string.'.xlsx');
     }
 
     public function exportStudentOnly (Request $request) {
         $term_exported = Term::find($request->term_id);
         $term_string = $term_exported->term_name.($term_exported->tourn_term ? 'tourn':'');
         $games_students = Game::where('fkey_term_id', $request->term_id)->orderBy('created_at', 'DESC')->studentPlayers()->get();
-        return \Excel::download(new GamesExport($games_students, $term_string), 'pingpong_students_'.$term_string.'.xlsx');
+        return \Excel::download(new GamesExport($games_students, $term_string), 'darts_students_'.$term_string.'.xlsx');
     }
 }
